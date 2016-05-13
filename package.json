@@ -1,0 +1,12 @@
+{
+  "name": "erhu",
+  "version": "1.0.0",
+  "description": "Erhu proxy",
+  "main": "main.js",
+  "scripts": {
+    "test": ""
+  },
+  "author": "erhujs",
+  "dependencies": {
+  }
+}
