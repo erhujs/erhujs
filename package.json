@@ -8,5 +8,6 @@
   },
   "author": "erhujs",
   "dependencies": {
+    "vue": "^1.0.24"
   }
 }
