@@ -8,6 +8,10 @@
   },
   "author": "erhujs",
   "dependencies": {
+    "express": "^4.13.4",
     "vue": "^1.0.24"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^1.1.3"
   }
 }

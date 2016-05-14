@@ -1,7 +1,7 @@
 const electron = require('electron')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
-const http = require('http')
+const proxy = require('./server/proxy')
 
 let mainWindow
 
@@ -27,12 +27,4 @@ app.on('window-all-closed', function () {
 	}
 })
 
-const server = http.createServer((req, res) => {
-	console.log(req.url)
-	res.write('ok')
-	res.end()
-})
-
-server.listen('9010', ()=>{
-	console.log('Proxy server listen on', 9010)
-})
+proxy()
