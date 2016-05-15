@@ -27,13 +27,6 @@ function proxy(reqCb, resCb) {
 		var path = urlObj.path || '/'
 		var method = req.method
 
-		reqCb({
-			host,
-			port,
-			method,
-			path: url.format(urlObj),
-			headers: req.headers
-		})
 		// emit request to UI
 		// var request = parseRequest(req)
 		// pass through
@@ -44,6 +37,14 @@ function proxy(reqCb, resCb) {
 			path: url.format(urlObj),
 			headers: req.headers
 		}, (proxyRes) => {
+			reqCb({
+				host,
+				port,
+				method,
+				path: url.format(urlObj),
+				headers: req.headers,
+				server: proxy.connection.remoteAddress
+			})
 			// remote ip
 			// proxyRes.connection.remoteAddress
 			console.log('Response from', proxy.connection.remoteAddress)
