@@ -16,7 +16,7 @@ function fixedHeaders(headers) {
     return hds
 }
 
-function proxy() {
+function proxy(reqCb, resCb) {
 	/**
 	 * Handle proxy request
 	 */
@@ -27,8 +27,7 @@ function proxy() {
 		var path = urlObj.path || '/'
 		var method = req.method
 
-		urlObj[host] = host
-		console.log('Request', {
+		reqCb({
 			host,
 			port,
 			method,

@@ -1,4 +1,5 @@
 const electron = require('electron')
+const ipcMain = electron.ipcMain
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const proxy = require('./server/proxy')
@@ -10,7 +11,7 @@ function createWindow() {
 
 	mainWindow.loadURL('file://' + __dirname + '/index.html')
 
-	// mainWindow.webContents.openDevTools()
+	mainWindow.webContents.openDevTools()
 
 	mainWindow.on('close', function () {
 
@@ -27,4 +28,8 @@ app.on('window-all-closed', function () {
 	}
 })
 
-proxy()
+proxy((req) => {
+	mainWindow.webContents.send('request', req)
+}, (res) => {
+	
+})

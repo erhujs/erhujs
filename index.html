@@ -5,6 +5,23 @@
 	<title>Erhu</title>
 </head>
 <body>
-	<h1>Hello Erhu</h1>
+	<ul>
+		
+	</ul>
+	<script>
+		var list = document.querySelector('ul')
+		var li = document.createElement('li')
+		const ipcRenderer = require('electron').ipcRenderer
+		// timing
+		ipcRenderer.on('request', (event, request) => {
+			li.innerHTML = `
+				<span>${request.host}</span>
+				<span>${request.path}</span>
+			`
+			list.appendChild(li)
+		})
+		ipcRenderer.on('response', (event, response) => {
+		})
+	</script>
 </body>
 </html>
