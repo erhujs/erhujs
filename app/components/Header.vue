@@ -25,5 +25,5 @@ export default {
 
 <style lang="stylus">
 .header
-  border 1px solid #000
+  margin-bottom 10px
 </style>

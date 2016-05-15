@@ -38,7 +38,8 @@ module.exports = {
         test: /\.js$/,
         // excluding some local linked packages.
         // for normal use cases only node_modules is needed.
-        exclude: /node_modules|vue\/src|vue-router\/|vue-loader\/|vue-hot-reload-api\//,
+        include: projectRoot,
+        exclude: /node_modules|lib/,
         loader: 'babel'
       },
       { 
