@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "dev": "webpack --progress --colors --watch --config ./tasks/webpack.base.conf.js",
-    "start": "electron ./"
+    "start": "electron ./",
+    "test": "bash test/index.sh"
   },
   "author": "erhujs",
   "dependencies": {
