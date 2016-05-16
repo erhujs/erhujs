@@ -3,45 +3,12 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Erhu</title>
-	<style>
-		.item {
-			text-align: center;
-			-webkit-box-flex: 1;
-		}
-	</style>
 </head>
 <body>
-	<ul>
-		
-	</ul>
-	<script>
-		var list = document.querySelector('ul')
-		var li = document.createElement('li')
-		li.setAttribute('style', `
-			line-height: 40px;
-			border-bottom: 1px solid #ccc;
-			display: -webkit-box;
-		`)
-		var el = li.cloneNode()
-		el.innerHTML = `
-			<div class="item">Host</div>
-			<div class="item">Path</div>
-			<div class="item">Server</div>
-		`
-		list.appendChild(el)
-		const ipcRenderer = require('electron').ipcRenderer
-		// timing
-		ipcRenderer.on('request', (event, request) => {
-			var el = li.cloneNode()
-			el.innerHTML = `
-				<div class="item">${request.host}</div>
-				<div class="item">${request.path}</div>
-				<div class="item">${request.server}</div>
-			`
-			list.appendChild(el)
-		})
-		ipcRenderer.on('response', (event, response) => {
-		})
+	<app></app>
+	<script type="text/javascript">
+		const electron = require('electron')
 	</script>
+	<script type="text/javascript" src="./build/bundle.js"></script>
 </body>
 </html>
