@@ -9,8 +9,8 @@ let mainWindow
 
 function createWindow() {
 	let mainWindowState = windowStateKeeper({
-    defaultWidth: 1400,
-    defaultHeight: 800
+    defaultWidth: 800,
+    defaultHeight: 600
   })
 
 	mainWindow = new BrowserWindow({
@@ -18,7 +18,7 @@ function createWindow() {
     'y': mainWindowState.y,
     'width': mainWindowState.width,
     'height': mainWindowState.height,
-		frame: false,	// without header
+		// frame: false,	// without header
 		// skipTaskbar: true,
 		// fullscreen: true
 	})
