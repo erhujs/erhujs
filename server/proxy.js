@@ -22,10 +22,14 @@ function proxy(reqCb, resCb) {
 	 */
 	const server = http.createServer((req, res) => {
 		var urlObj = url.parse(req.url)
-		var host = req.headers.host
+		var host = req.headers.host || urlObj.host
 		var port = url.parse(host).port || 80
 		var path = urlObj.path || '/'
 		var method = req.method
+
+
+		// reset port
+		urlObj.port = port
 
 		// emit request to UI
 		// var request = parseRequest(req)
@@ -53,14 +57,13 @@ function proxy(reqCb, resCb) {
 				res.write(data)
 			})
 			proxyRes.on('end', () => {
+				resCb()
 				console.log('on end')
 				// emit response end
 				res.end()
 			})
 		})
 		proxy.end()
-		// proxy.on('connect', (req, cltSocket, head) => {
-		// })
 	})
 	var port = 8888
 	server.listen(port, () => {
