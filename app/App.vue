@@ -15,6 +15,7 @@
 <script>
 import Header from './components/Header.vue'
 import Item from './components/Item.vue'
+import electron from 'electron'
 const ipcRenderer = electron.ipcRenderer
 
 export default {

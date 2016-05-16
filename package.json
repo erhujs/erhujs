@@ -5,10 +5,12 @@
   "main": "main.js",
   "scripts": {
     "dev": "webpack --progress --colors --watch --config ./tasks/webpack.base.conf.js",
-    "start": "electron ./"
+    "start": "electron ./",
+    "test": "bash test/index.sh"
   },
   "author": "erhujs",
   "dependencies": {
+    "electron-window-state": "^3.0.3",
     "express": "^4.13.4",
     "vue": "^1.0.24",
     "vuex": "^0.6.3"
