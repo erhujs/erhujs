@@ -3,7 +3,7 @@
     <c-header></c-header>
     <ul class="req-list">
       <li>
-        <c-item :req="reqHead"></c-item>
+        <c-item :req="reqHead" index="#"></c-item>
       </li>
       <li v-for="it in reqList">
         <c-item :req="it"></c-item>  
@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import config from './config.js'
 import Header from './components/Header.vue'
 import Item from './components/Item.vue'
 import electron from 'electron'
@@ -30,11 +31,7 @@ export default {
   },
   data () {
     return {
-      reqHead: {
-        host: 'host',
-        path: 'path',
-        server: 'server'
-      },
+      reqHead: config.reqHead,
       reqList: []
     }
   },
