@@ -13,7 +13,7 @@
           </li>
         </ul>
       </c-panel>
-      <c-splitter></c-splitter>
+      <c-split></c-split>
       <c-panel :width="panel.right">
         content box
       </c-panel>
@@ -29,7 +29,7 @@ import config from './config.js'
 import Header from './components/Header.vue'
 import Menu from './components/Menu.vue'
 import Panel from './components/Panel.vue'
-import Splitter from './components/Splitter.vue'
+import Split from './components/Split.vue'
 import Footer from './components/Footer.vue'
 import Item from './components/Item.vue'
 
@@ -40,7 +40,7 @@ export default {
   components: {
     'c-header': Header,
     'c-menu': Menu,
-    'c-splitter': Splitter,
+    'c-split': Split,
     'c-panel': Panel,
     'c-footer': Footer,
     'c-item': Item,

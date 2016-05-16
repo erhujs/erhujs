@@ -1,5 +1,5 @@
 <template>
-  <div class="c-splitter" 
+  <div class="c-split" 
     @mousedown="onMouseDown" 
     @mousemove="onMouseMove" 
     @mouseup="onMouseUp"
@@ -10,7 +10,7 @@
 <script>
 
 export default {
-  name: 'c-splitter',
+  name: 'c-split',
   props: {
   },
   methods: {
@@ -31,10 +31,11 @@ export default {
 </script>
 
 <style lang="stylus">
-.c-splitter
-  width 4px
+.c-split
+  width 10px
   height 100%
   margin-bottom 10px
-  background #f8f9f9
+  background #eee
   cursor col-resize
+  background-image: url('../assets/images/vertical.png');
 </style>
