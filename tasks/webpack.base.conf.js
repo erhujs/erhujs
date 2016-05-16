@@ -59,7 +59,8 @@ module.exports = {
   babel: {
     presets: ['es2015'],
     plugins: ['transform-runtime']
-  }
+  },
+  target: 'electron'
 }
 
 if (process.env.NODE_ENV === 'production') {
