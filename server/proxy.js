@@ -27,13 +27,24 @@ function proxy(reqCb, resCb) {
 		var path = urlObj.path || '/'
 		var method = req.method
 
-
 		// reset port
 		urlObj.port = port
-
+		// prevent repeat port
+		if (port == 80) {
+			urlObj.port = ''
+		}
 		// emit request to UI
 		// var request = parseRequest(req)
 		// pass through
+		reqCb({
+			host,
+			port,
+			method,
+			path: url.format(urlObj),
+			headers: req.headers,
+			server: '...'
+			// server: proxy.connection.remoteAddress
+		})
 		var proxy = http.request({
 			host,
 			port,
@@ -41,14 +52,6 @@ function proxy(reqCb, resCb) {
 			path: url.format(urlObj),
 			headers: req.headers
 		}, (proxyRes) => {
-			reqCb({
-				host,
-				port,
-				method,
-				path: url.format(urlObj),
-				headers: req.headers,
-				server: proxy.connection.remoteAddress
-			})
 			// remote ip
 			// proxyRes.connection.remoteAddress
 			console.log('Response from', proxy.connection.remoteAddress)
@@ -62,6 +65,9 @@ function proxy(reqCb, resCb) {
 				// emit response end
 				res.end()
 			})
+		})
+		proxy.on('connect', function (proxyReq) {
+			console.log('connect:', proxyReq.connection.remoteAddress)
 		})
 		proxy.end()
 	})
