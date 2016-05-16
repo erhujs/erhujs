@@ -1,5 +1,6 @@
 export default {
   reqHead: {
+    index: '#',
     result: 'Result',
     protocol: 'Protocol',
     host: 'Host',
