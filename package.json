@@ -9,6 +9,7 @@
   },
   "author": "erhujs",
   "dependencies": {
+    "electron-window-state": "^3.0.3",
     "express": "^4.13.4",
     "vue": "^1.0.24",
     "vuex": "^0.6.3"
