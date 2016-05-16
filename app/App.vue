@@ -19,6 +19,7 @@
       </c-panel>
     </section>
     <c-footer></c-footer>
+    <mdl-checkbox :checked.sync="checked">Checkbox</mdl-checkbox>
   </div>
 </template>
 
@@ -42,7 +43,7 @@ export default {
     'c-splitter': Splitter,
     'c-panel': Panel,
     'c-footer': Footer,
-    'c-item': Item
+    'c-item': Item,
   },
   props: {
   },
@@ -55,7 +56,8 @@ export default {
       panel: {
         left: 50,
         right: 50
-      }
+      },
+      checked: false
     }
   },
   ready () {
