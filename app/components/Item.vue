@@ -1,5 +1,6 @@
 <template>
   <div class="c-item">
+    <div class="item">{{index}}</div>
     <div class="item">{{req.host}}</div>
     <div class="item">{{req.path}}</div>
     <div class="item">{{req.server}}</div>
@@ -11,6 +12,7 @@
 export default {
   name: 'c-item',
   props: {
+    index: String|Number,
     req: Object
   },
   computed: {
