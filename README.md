@@ -4,6 +4,7 @@
 
 ```bash
 npm i -g electron-prebuilt 
+npm i 
 ```
 
 ## run
