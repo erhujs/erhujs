@@ -1,3 +1,4 @@
+const path = require('path')
 const electron = require('electron')
 const windowStateKeeper = require('electron-window-state')
 const ipcMain = electron.ipcMain
