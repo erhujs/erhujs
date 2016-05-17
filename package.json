@@ -6,7 +6,7 @@
   "license": "",
   "repository": "",
   "scripts": {
-    "dev": "webpack --progress --colors --watch --config ./tasks/webpack.base.conf.js",
+    "dev": "node tasks/dev.js",
     "start": "electron ./",
     "test": "bash test/index.sh"
   },
