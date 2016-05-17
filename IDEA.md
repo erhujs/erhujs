@@ -2,6 +2,9 @@
 
 
 
+###
+- [vue-electron脚手架，项目构件从这儿学了好多](https://github.com/bradstewart/electron-boilerplate-vue)
+
 
 ### material UI 界面设计的参考(参考使用)
 - https://dribbble.com/kyleledbetter 

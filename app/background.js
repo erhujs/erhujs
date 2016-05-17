@@ -1,3 +1,4 @@
+const path = require('path')
 const electron = require('electron')
 const windowStateKeeper = require('electron-window-state')
 const ipcMain = electron.ipcMain
@@ -33,7 +34,7 @@ function createWindow() {
 
   mainWindow.webContents.openDevTools()
 
-  mainWindow.on('close', function () {
+  mainWindow.on('closed', function () {
 
     // Dereference
     mainWindow = null
