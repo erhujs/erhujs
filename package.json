@@ -8,12 +8,8 @@
     "build": "rimraf dist && mkdirp dist && NODE_ENV=production webpack --progress --hide-modules --config build/webpack.prod.conf.js",
     "package": "node build/package.js",
     "package:osx": "node build/package.js --platform=darwin --arch=x64",
-    "package:win": "node build/package.js --platform=win32",
-    "package:linux": "node build/package.js --platform=linux",
     "release": "npm run build && npm run package",
-    "unit": "karma start test/unit/karma.conf.js --single-run",
-    "e2e": "node test/e2e/runner.js",
-    "test": "npm run unit && npm run e2e"
+    "test": "bash test/develop/index.sh"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
