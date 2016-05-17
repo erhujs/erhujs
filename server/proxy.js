@@ -62,18 +62,23 @@ function proxy(reqCb, resCb) {
 				// emit response
 				res.write(data)
 			})
-
-			proxyRes.on('end', () => {
+      proxyRes.on('end', () => {
         console.log('#'+id, 'Request End...')
-				resCb({
+        resCb({
           id,
-					headers: proxyRes.headers,
-					data: buf
-				})
-				// emit response end
-				res.end()
-			})
-		})
+          headers: proxyRes.headers,
+          data: buf
+        })
+        // emit response end
+        res.end()
+      })
+    })
+    // request connected
+    proxy.on('socket', (socket)=>{
+      socket.on('connect', () => {
+        console.log('#'+id, 'socket', socket.remoteAddress)
+      })
+    })
 		proxy.end()
 	})
 	var port = 8888
