@@ -50,11 +50,12 @@ function proxy(reqCb, resCb) {
 			console.log('Response from', requestOpts.server)
 			var buf = new Buffer('')
 			proxyRes.on('data', (data) => {
-				buf = Buffer.concat([buf, data], buf.length + data.length)
+        buf = Buffer.concat([buf, data], buf.length + data.length)
 				// emit response
 				res.write(data)
 			})
 			proxyRes.on('end', () => {
+        console.log('RequestEnd...')
 				resCb({
 					headers: proxyRes.headers,
 					data: buf
