@@ -33,41 +33,35 @@ function proxy(reqCb, resCb) {
 		if (port == 80) {
 			urlObj.port = ''
 		}
-		// emit request to UI
-		// var request = parseRequest(req)
-		// pass through
-		reqCb({
-			host,
-			port,
-			method,
-			path: url.format(urlObj),
-			headers: req.headers,
-			server: '...'
-			// server: proxy.connection.remoteAddress
-		})
-		var proxy = http.request({
+
+		var requestOpts = {
 			host,
 			port,
 			method,
 			path: url.format(urlObj),
 			headers: req.headers
-		}, (proxyRes) => {
+		}
+		// pass to rendered process
+		reqCb(requestOpts)
+		var proxy = http.request(requestOpts, (proxyRes) => {
+			requestOpts.server = proxy.connection.remoteAddress
 			// remote ip
 			// proxyRes.connection.remoteAddress
-			console.log('Response from', proxy.connection.remoteAddress)
+			console.log('Response from', requestOpts.server)
+			var buf = new Buffer('')
 			proxyRes.on('data', (data) => {
+				buf = Buffer.concat([buf, data], buf.length + data.length)
 				// emit response
 				res.write(data)
 			})
 			proxyRes.on('end', () => {
-				resCb()
-				console.log('on end')
+				resCb({
+					headers: proxyRes.headers,
+					data: buf
+				})
 				// emit response end
 				res.end()
 			})
-		})
-		proxy.on('connect', function (proxyReq) {
-			console.log('connect:', proxyReq.connection.remoteAddress)
 		})
 		proxy.end()
 	})

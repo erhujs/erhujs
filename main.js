@@ -9,15 +9,15 @@ let mainWindow
 
 function createWindow() {
 	let mainWindowState = windowStateKeeper({
-    defaultWidth: 800,
-    defaultHeight: 600
+	defaultWidth: 800,
+	defaultHeight: 600
   })
 
 	mainWindow = new BrowserWindow({
 		'x': mainWindowState.x,
-    'y': mainWindowState.y,
-    'width': mainWindowState.width,
-    'height': mainWindowState.height,
+		'y': mainWindowState.y,
+		'width': mainWindowState.width,
+		'height': mainWindowState.height,
 		// frame: false,	// without header
 		// skipTaskbar: true,
 		// fullscreen: true
@@ -45,5 +45,5 @@ app.on('window-all-closed', function () {
 proxy((req) => {
 	mainWindow.webContents.send('request', req)
 }, (res) => {
-	
+  mainWindow.webContents.send('response', res)
 })
