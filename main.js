@@ -42,6 +42,11 @@ app.on('window-all-closed', function () {
 	}
 })
 
+// proxy{
+//   beforeRequest: (res)=>{
+
+//   }
+// }
 proxy((req) => {
 	mainWindow.webContents.send('request', req)
 }, (res) => {
