@@ -1,5 +1,10 @@
-node_modules
 .DS_Store
-npm-debug.log
-.idea
-build
+Thumbs.db
+node_modules/
+app/dist/
+dist/
+releases/
+npm-debug.log*
+selenium-debug.log
+test/unit/coverage
+test/e2e/reports
