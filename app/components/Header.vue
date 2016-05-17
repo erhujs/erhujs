@@ -14,7 +14,7 @@ export default {
   },
   data () {
     return {
-      title: 'erhu header'
+      title: 'erhu header test'
     }
   },
   methods: {
