@@ -4,17 +4,29 @@
 
 ```bash
 npm i -g electron-prebuilt 
+npm i 
 ```
 
 ## run
 
 ```bash
-electron ./
+npm run start
+```
+
+### use vue-devtool
+
+```js
+// config.js
+vueDevTools: true
 ```
 
 
+## build
 
-
+```bash
+npm run build
+# will build to dist
+```
 
 
 
