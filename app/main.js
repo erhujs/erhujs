@@ -14,7 +14,5 @@ window.componentHandler = componentHandler
 
 new Vue({
   el: 'body',
-  components: {
-    App
-  }
+  components: { App }
 })

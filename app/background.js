@@ -34,7 +34,7 @@ function createWindow() {
 
   mainWindow.webContents.openDevTools()
 
-  mainWindow.on('close', function () {
+  mainWindow.on('closed', function () {
 
     // Dereference
     mainWindow = null
