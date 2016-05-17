@@ -62,8 +62,7 @@ export default {
   },
   ready () {
     ipcRenderer.on('request', (event, request) => {
-      console.log(event, request
-        )
+      console.log(event, request)
       this.reqList.push({
         host: request.host,
         path: request.path,
@@ -71,6 +70,9 @@ export default {
       })
     })
     ipcRenderer.on('response', (event, response) => {
+      console.log(event, response)
+      // content =>
+      // console.log(response.data)
     })
   },
   methods: {
