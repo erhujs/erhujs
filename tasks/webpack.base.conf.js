@@ -1,18 +1,28 @@
-var vue = require('vue-loader')
 var path = require('path')
-var webpack = require("webpack")
-var ExtractTextPlugin = require("extract-text-webpack-plugin")
+var config = require('../config')
+var utils = require('./utils')
 var projectRoot = path.resolve(__dirname, '../')
-var cssLoader = ExtractTextPlugin.extract('style-loader', 'css-loader')
 
 module.exports = {
   entry: {
     app: './app/app.js'
   },
   output: {
-    path: './build',
-    publicPath: '/build/',
-    filename: 'bundle.js'
+    path: config.build.assetsRoot,
+    publicPath: config.build.assetsPublicPath,
+    filename: '[name].js'
+  },
+  resolve: {
+    extensions: ['', '.js', '.vue'],
+    fallback: [path.join(__dirname, '../node_modules')],
+    alias: {
+      'app': path.resolve(__dirname, '../app'),
+      'assets': path.resolve(__dirname, '../app/assets'),
+      'components': path.resolve(__dirname, '../app/components')
+    }
+  },
+  resolveLoader: {
+    fallback: [path.join(__dirname, '../node_modules')]
   },
   module: {
     // preLoaders: [
@@ -36,53 +46,34 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        // excluding some local linked packages.
-        // for normal use cases only node_modules is needed.
+        loader: 'babel',
         include: projectRoot,
-        exclude: /node_modules|lib/,
-        loader: 'babel'
-      },
-      { 
-        test: /\.css$/, 
-        loader: cssLoader 
+        exclude: /node_modules/
       },
       {
-        test: /\.styl$/,
-        loader: ExtractTextPlugin.extract('style-loader','css-loader!stylus-loader')
+        test: /\.json$/,
+        loader: 'json'
+      },
+      {
+        test: /\.html$/,
+        loader: 'vue-html'
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg|woff2?|eot|ttf|otf)(\?.*)?$/,
+        loader: 'url',
+        query: {
+          limit: 10,
+          name: utils.assetsPath('[name].[hash:7].[ext]', './' + config.build.assetsPublicPath)
+        }
       }
     ]
   },
   eslint: {
     formatter: require('eslint-friendly-formatter')
   },
-  devtool: '#source-map',
-  babel: {
-    presets: ['es2015'],
-    plugins: ['transform-runtime']
+  vue: {
+    loaders: utils.cssLoaders()
   },
   target: 'electron'
 }
 
-if (process.env.NODE_ENV === 'production') {
-  
-  delete module.exports.devtool
-  module.exports.plugins = [
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"'
-      }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    }),
-    new webpack.optimize.OccurenceOrderPlugin()
-    // new ExtractTextPlugin('build.css')
-  ]
-} else {
-  // module.exports.plugins = [
-  //   new ExtractTextPlugin('build.css')
-  // ]
-  // module.exports.devtool = '#source-map'
-}
