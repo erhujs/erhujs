@@ -23,7 +23,8 @@ module.exports = {
     extensions: ['', '.js', '.vue'],
     fallback: [path.join(__dirname, '../node_modules')],
     alias: {
-      app: path.resolve(__dirname, '../app')
+      app: path.resolve(__dirname, '../app'),
+      'material.min.css': path.join(__dirname, 'app/node_modules/material-design-lite/material.min.css')
     }
   },
   resolveLoader: {
@@ -58,6 +59,10 @@ module.exports = {
       {
         test: /\.json$/,
         loader: 'json'
+      },
+      {
+        test: /\.css$/,
+        loader: "style-loader!css-loader"
       },
       {
         test: /\.html$/,
