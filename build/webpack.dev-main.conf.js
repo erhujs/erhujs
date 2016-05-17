@@ -49,20 +49,20 @@ var webpackConfig = merge(webpackBaseConfig, {
   ]
 })
 
-if (config.dev.vueDevTools) {
-  webpackConfig.entry.app.unshift(
-    './tools/vue-devtools/hook.js',
-    './tools/vue-devtools/backend.js'
-  )
-  webpackConfig.entry.devtools = './tools/vue-devtools/devtools.js'
+// if (config.dev.vueDevTools) {
+//   webpackConfig.entry.app.unshift(
+//     './tools/vue-devtools/hook.js',
+//     './tools/vue-devtools/backend.js'
+//   )
+//   webpackConfig.entry.devtools = './tools/vue-devtools/devtools.js'
 
-  webpackConfig.plugins.push(new HtmlWebpackPlugin({
-    filename: 'devtools.html',
-    template: './tools/vue-devtools/index.html',
-    chunks: ['devtools'],
-    inject: true
-  }))
-}
+//   webpackConfig.plugins.push(new HtmlWebpackPlugin({
+//     filename: 'devtools.html',
+//     template: './tools/vue-devtools/index.html',
+//     chunks: ['devtools'],
+//     inject: true
+//   }))
+// }
 
 module.exports = webpackConfig 
 
