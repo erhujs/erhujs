@@ -76,7 +76,7 @@ function proxy(reqCb, resCb) {
     // request connected
     proxy.on('socket', (socket)=>{
       socket.on('connect', () => {
-        console.log('#'+id, 'socket', socket.remoteAddress)
+        console.log('#'+id, 'Connected', socket.remoteAddress)
       })
     })
 		proxy.end()
