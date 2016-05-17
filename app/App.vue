@@ -15,7 +15,7 @@
       </c-panel>
       <c-split></c-split>
       <c-panel :width="panel.right">
-        content box
+        <span>Content: <br>{{resContent}}</span>
       </c-panel>
     </section>
     <c-footer></c-footer>
@@ -57,6 +57,7 @@ export default {
         left: 50,
         right: 50
       },
+      resContent: '',
       checked: false
     }
   },
@@ -71,8 +72,7 @@ export default {
     })
     ipcRenderer.on('response', (event, response) => {
       console.log(event, response)
-      // content =>
-      // console.log(response.data)
+      this.resContent = response.data.toString()
     })
   },
   methods: {
