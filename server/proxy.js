@@ -2,6 +2,7 @@ const http = require('http')
 const express = require('express')
 const net = require('net')
 const url = require('url')
+const shortid = require('shortid')
 
 
 function fixedHeaders(headers) {
@@ -34,29 +35,38 @@ function proxy(reqCb, resCb) {
 			urlObj.port = ''
 		}
 
-		var requestOpts = {
-			host,
-			port,
-			method,
-			path: url.format(urlObj),
-			headers: req.headers
-		}
+    var id = shortid.generate()
+    var reqOpts = {
+      host,
+      port,
+      method,
+      path: url.format(urlObj),
+      headers: req.headers
+    }
+
+		var request = Object.assign({
+      id
+    }, reqOpts)
 		// pass to rendered process
-		reqCb(requestOpts)
-		var proxy = http.request(requestOpts, (proxyRes) => {
-			requestOpts.server = proxy.connection.remoteAddress
+		reqCb(request)
+
+    // do proxy request
+		var proxy = http.request(reqOpts, (proxyRes) => {
+			request.server = proxy.connection.remoteAddress
 			// remote ip
-			// proxyRes.connection.remoteAddress
-			console.log('Response from', requestOpts.server)
+
+			console.log('#'+id, 'Response from', request.server)
 			var buf = new Buffer('')
 			proxyRes.on('data', (data) => {
         buf = Buffer.concat([buf, data], buf.length + data.length)
 				// emit response
 				res.write(data)
 			})
+
 			proxyRes.on('end', () => {
-        console.log('RequestEnd...')
+        console.log('#'+id, 'Request End...')
 				resCb({
+          id,
 					headers: proxyRes.headers,
 					data: buf
 				})
