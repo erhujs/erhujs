@@ -86,12 +86,12 @@ export default {
 
 <style lang="stylus">
 .req-list
-  margin 0
-  padding 0
-  li
-    list-style none
+	margin 0
+	padding 0
+	li
+		list-style none
 .container
-  height 200px
-  display flex
-  border 1px solid #eee
+	height 200px
+	display flex
+	border 1px solid #eee
 </style>
