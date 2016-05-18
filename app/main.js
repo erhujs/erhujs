@@ -1,16 +1,36 @@
 /* eslint-disable */
-// material-design-lite lib
-import 'material-design-lite/material.min.css'
-import 'material-design-lite/material.min.js'
 
 import Vue from 'vue'
 import Vuex from 'vuex'
-import VueMdl from 'vue-mdl'
-
+import photon from './ui/photon'
 import App from './App'
 
-Vue.use(VueMdl)
 Vue.use(Vuex)
+
+Vue.component('p-actionbar', photon.Actionbar)
+Vue.component('p-button', photon.Button)
+Vue.component('p-button-group', photon.ButtonGroup)
+Vue.component('p-content', photon.Content)
+Vue.component('p-checkbox', photon.CheckBox)
+Vue.component('p-icon', photon.Icon)
+Vue.component('p-input', photon.Input)
+Vue.component('p-list-group', photon.ListGroup)
+Vue.component('p-list-item', photon.ListItem)
+Vue.component('p-nav-group', photon.NavGroup)
+Vue.component('p-nav-group-item', photon.NavGroupItem)
+Vue.component('p-navtitle', photon.NavTitle)
+Vue.component('p-options', photon.Options)
+Vue.component('p-pane', photon.Pane)
+Vue.component('p-pane-group', photon.PaneGroup)
+Vue.component('p-radio', photon.Radio)
+Vue.component('p-radio-group', photon.RadioGroup)
+Vue.component('p-tab-group', photon.TabGroup)
+Vue.component('p-tabitem', photon.TabItem)
+Vue.component('p-table', photon.Table)
+Vue.component('p-textarea', photon.TextArea)
+Vue.component('p-header', photon.Header)
+Vue.component('p-footer', photon.Footer)
+Vue.component('p-window', photon.Window)
 
 new Vue({
   el: 'body',
