@@ -3,7 +3,7 @@ const express = require('express')
 const net = require('net')
 const url = require('url')
 const shortid = require('shortid')
-
+const rawBody = require('raw-body')
 
 function fixedHeaders(headers) {
     var hds = {}
@@ -18,10 +18,12 @@ function fixedHeaders(headers) {
 }
 
 function proxy(reqCb, resCb) {
+  const server = express()
   /**
    * Handle proxy request
    */
-  const server = http.createServer((req, res) => {
+  server.use((req, res) => {
+    console.log('Request', req.url)
     var urlObj = url.parse(req.url)
     var host = req.headers.host || urlObj.host
     var port = url.parse(host).port || 80
@@ -79,7 +81,12 @@ function proxy(reqCb, resCb) {
         console.log('#'+id, 'Connected', socket.remoteAddress)
       })
     })
-    proxy.end()
+    req.on('data', function (buf) {
+      proxy.write(buf)
+    })
+    req.on('end', function () {
+      proxy.end()
+    })
   })
   var port = 8888
   server.listen(port, () => {
