@@ -3,23 +3,24 @@
     <c-header></c-header>
     <c-menu></c-menu>
     <section class="container">
-      <c-panel :width="panel.left">
+      <c-panel :size="panel.left">
         <ul class="req-list">
           <li>
             <c-item :req="reqHead" index="#"></c-item>
           </li>
           <li v-for="it in reqList">
-            <c-item :req="it"></c-item>  
+            <c-item :req="it"></c-item>
           </li>
         </ul>
       </c-panel>
-      <c-split></c-split>
-      <c-panel :width="panel.right">
+      <c-split :setting.sync="panel"></c-split>
+      <c-panel :size="panel.right">
         <span>Content: <br>{{resContent}}</span>
       </c-panel>
     </section>
     <c-footer></c-footer>
-    <mdl-checkbox :checked.sync="checked">Checkbox</mdl-checkbox>
+    <!-- <mdl-checkbox :checked.sync="checked">Checkbox</mdl-checkbox>
+    <mdl-button v-mdl-ripple-effect colored raised>Ripple Effect</mdl-button> -->
   </div>
 </template>
 
@@ -34,7 +35,6 @@ import Footer from './components/Footer.vue'
 import Item from './components/Item.vue'
 
 const ipcRenderer = electron.ipcRenderer
-
 export default {
   name: 'App',
   components: {
@@ -55,13 +55,15 @@ export default {
       reqList: [],
       panel: {
         left: 50,
-        right: 50
+        right: 50,
+        minSize: 100
       },
       resContent: '',
       checked: false
     }
   },
   ready () {
+    console.log('xxx')
     ipcRenderer.on('request', (event, request) => {
       console.log(event, request)
       this.reqList.push({
@@ -76,19 +78,19 @@ export default {
     })
   },
   methods: {
-    
+
   }
 }
 </script>
 
 <style lang="stylus">
 .req-list
-  margin 0
-  padding 0
-  li
-    list-style none
+	margin 0
+	padding 0
+	li
+		list-style none
 .container
-  height 200px
-  display flex
-  border 1px solid #eee
+	height 200px
+	display flex
+	border 1px solid #eee
 </style>

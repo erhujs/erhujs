@@ -1,89 +1,119 @@
+'use strict'
+
 const http = require('http')
 const express = require('express')
-const net = require('net')
 const url = require('url')
 const shortid = require('shortid')
 
+function safeCall(fn) {
+	if (typeof fn != 'function') return
 
-function fixedHeaders(headers) {
-    var hds = {}
-    Object.keys(headers).forEach(function (name) {
-        var value = headers[name]
-        name = name.replace(/(^|-)([a-z])/g, function (m, s, w) {
-            return (s || '') + w.toUpperCase()
-        })
-        hds[name] = value
-    })
-    return hds
+	var args = [].slice.call(arguments, 1)
+	return fn.apply(null, args)
 }
 
-function proxy(reqCb, resCb) {
-  /**
-   * Handle proxy request
-   */
-  const server = http.createServer((req, res) => {
-    var urlObj = url.parse(req.url)
-    var host = req.headers.host || urlObj.host
-    var port = url.parse(host).port || 80
-    var path = urlObj.path || '/'
-    var method = req.method
+function proxy(options) {
+	const server = express()
 
-    // reset port
-    urlObj.port = port
-    // prevent repeat port
-    if (port == 80) {
-      urlObj.port = ''
-    }
+	/**
+	 * Handle proxy request
+	 */
+	server.use((req, res) => {
+		console.log('Request', req.url)
+		var urlObj = url.parse(req.url)
+		var host = req.headers.host || urlObj.host
+		var port = url.parse(host).port || 80
+		var method = req.method
 
-    var id = shortid.generate()
-    var reqOpts = {
-      host,
-      port,
-      method,
-      path: url.format(urlObj),
-      headers: req.headers
-    }
+		// reset port
+		urlObj.port = port
+			// prevent repeat port
+		if (port == 80) {
+			urlObj.port = ''
+		}
 
-    var request = Object.assign({
-      id
-    }, reqOpts)
-    // pass to rendered process
-    reqCb(request)
+		const id = shortid.generate()
+		var reqOpts = {
+			host,
+			port,
+			method,
+			path: url.format(urlObj),
+			headers: req.headers
+		}
+		var request = Object.assign({
+			id,
+			body: new Buffer('')
+		}, reqOpts)
 
-    // do proxy request
-    var proxy = http.request(reqOpts, (proxyRes) => {
-      request.server = proxy.connection.remoteAddress
-      // remote ip
+		/**
+		 * @event beforeRequest
+		 */
+		safeCall(options.beforeRequest, request)
+		var proxy = http.request(reqOpts, (proxyRes) => {
+			request.server = proxy.connection.remoteAddress
+				// remote ip
+			var response = {
+					id,
+					headers: proxyRes.headers,
+					data: new Buffer('')
+				}
+				/**
+				 * @event beforeReponse
+				 */
+			safeCall(options.beforeReponse, request, response)
+			proxyRes.on('data', (data) => {
+				response.data = Buffer.concat([response.data, data], response.data.length + data.length)
+					// emit response
+				res.write(data)
+					/**
+					 * @event response
+					 */
+				safeCall(options.reponse, request, response)
+			})
+			proxyRes.on('end', () => {
+				console.log('#' + id, 'Request End...')
+					// emit response end
+				res.end()
+					/**
+					 * @event reponseEnd
+					 */
+				safeCall(options.reponseEnd, request, response)
+			})
+		})
 
-      console.log('#'+id, 'Response from', request.server)
-      var buf = new Buffer('')
-      proxyRes.on('data', (data) => {
-        buf = Buffer.concat([buf, data], buf.length + data.length)
-        // emit response
-        res.write(data)
-      })
-      proxyRes.on('end', () => {
-        console.log('#'+id, 'Request End...')
-        resCb({
-          id,
-          headers: proxyRes.headers,
-          data: buf
-        })
-        // emit response end
-        res.end()
-      })
-    })
-    // request connected
-    proxy.on('socket', (socket)=>{
-      socket.on('connect', () => {
-        console.log('#'+id, 'Connected', socket.remoteAddress)
-      })
-    })
-    proxy.end()
-  })
-  var port = 8888
-  server.listen(port, () => {
-    console.log('Proxy server listen on', port)
-  })
+		req.on('data', function(buf) {
+			proxy.write(buf)
+				/**
+				 * @event proxyReceive
+				 */
+			request.body = Buffer.concat([request.body, buf], request.body.length + buf.length)
+			safeCall(options.proxyReceive, request)
+		})
+
+		req.on('end', function() {
+			/**
+			 * @event proxyReceived
+			 */
+			safeCall(options.proxyReceived, request)
+			proxy.end()
+		})
+
+		// request connected
+		proxy.on('socket', (socket) => {
+			socket.on('connect', () => {
+				/**
+				 * @event connect
+				 */
+				request.server = socket.remoteAddress
+				safeCall(options.connect, request)
+			})
+		})
+	})
+
+
+	var port = 8888
+	server.listen(port, () => {
+		console.log('Proxy server listen on', port)
+	})
 }
 module.exports = proxy

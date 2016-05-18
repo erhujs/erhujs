@@ -1,5 +1,5 @@
 <template>
-  <div class="c-panel" :style="{width: width + '%'}">
+  <div class="c-panel" :style="{width: widthStyle}">
     <slot>panel</slot>
   </div>
 </template>
@@ -9,11 +9,11 @@
 export default {
   name: 'c-panel',
   props: {
-    width: Number
+    size: Number
   },
   computed: {
     widthStyle () {
-
+      return 'calc(' + this.size + '% - 5px)'
     }
   },
   methods: {

@@ -12,6 +12,7 @@
 export default {
   name: 'c-split',
   props: {
+    setting: Object
   },
   methods: {
     onMouseDown (e) {
@@ -37,5 +38,7 @@ export default {
   margin-bottom 10px
   background #eee
   cursor col-resize
-  background-image: url('../assets/images/vertical.png');
+  background-image url('../assets/images/vertical.png')
+  background-repeat no-repeat
+  background-position center center
 </style>
