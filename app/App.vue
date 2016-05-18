@@ -35,7 +35,6 @@ import Footer from './components/Footer.vue'
 import Item from './components/Item.vue'
 
 const ipcRenderer = electron.ipcRenderer
-
 export default {
 	name: 'App',
 	components: {
@@ -49,6 +48,8 @@ export default {
 	props: {
 	},
 	computed: {
+	},
+	created () {
 	},
 	data () {
 		return {
