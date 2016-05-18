@@ -3,7 +3,7 @@
     <c-header></c-header>
     <c-menu></c-menu>
     <section class="container">
-      <c-panel :width="panel.left">
+      <c-panel :size="panel.left">
         <ul class="req-list">
           <li>
             <c-item :req="reqHead" index="#"></c-item>
@@ -13,14 +13,14 @@
           </li>
         </ul>
       </c-panel>
-      <c-split></c-split>
-      <c-panel :width="panel.right">
+      <c-split :setting.sync="panel"></c-split>
+      <c-panel :size="panel.right">
         <span>Content: <br>{{resContent}}</span>
       </c-panel>
     </section>
     <c-footer></c-footer>
-    <mdl-checkbox :checked.sync="checked">Checkbox</mdl-checkbox>
-    <mdl-button v-mdl-ripple-effect colored raised>Ripple Effect</mdl-button>
+    <!-- <mdl-checkbox :checked.sync="checked">Checkbox</mdl-checkbox>
+    <mdl-button v-mdl-ripple-effect colored raised>Ripple Effect</mdl-button> -->
   </div>
 </template>
 
@@ -56,13 +56,15 @@ export default {
       reqList: [],
       panel: {
         left: 50,
-        right: 50
+        right: 50,
+        minSize: 100
       },
       resContent: '',
       checked: false
     }
   },
   ready () {
+    console.log('xxx')
     ipcRenderer.on('request', (event, request) => {
       console.log(event, request)
       this.reqList.push({
