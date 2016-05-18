@@ -68,7 +68,7 @@ request {
 response {
 	id,			// 与请求对象的 ID 一致
 	headers,	// 响应头
-	body		// <Buffer> 响应内容，只能在 reponseEnd 事件触发后拿到完整的值
+	data		// <Buffer> 响应内容，只能在 reponseEnd 事件触发后拿到完整的值
 }
 ```
 
