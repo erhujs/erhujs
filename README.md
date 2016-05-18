@@ -87,13 +87,13 @@ response {
 * connect(req)
 	代理请求成功建立链接时触发。`触发一次`
 
-* beforeReponse(req, response)
+* beforeReponse(req, res)
 	接收到响应的第一个包时触发。`触发一次`
 
-* reponse
+* reponse(req, res)
 	接收到响应body时触发。`多次触发`
 
-* reponseEnd
+* reponseEnd(req, res)
 	完成响应body接收后触发。`触发一次`
 
 
