@@ -3,8 +3,7 @@
     @mousedown="onMouseDown" 
     @mousemove="onMouseMove" 
     @mouseup="onMouseUp"
-    @mouseleave="onMouseOut">
-    </div>
+    @mouseleave="onMouseOut"></div>
 </template>
 
 <script>
@@ -35,7 +34,6 @@ export default {
 .c-split
   width 10px
   height 100%
-  margin-bottom 10px
   background #eee
   cursor col-resize
   background-image url('../assets/images/vertical.png')

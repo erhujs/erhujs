@@ -5,18 +5,11 @@
     <main class="mdl-layout__content">
       <div class="page-content container">
         <c-panel :size="panel.left">
-          <ul class="req-list">
-            <li>
-              <c-item :req="reqHead" index="#"></c-item>
-            </li>
-            <li v-for="it in reqList">
-              <c-item :req="it"></c-item>
-            </li>
-          </ul>
+          <c-req-list :list="reqList"></c-req-list>
         </c-panel>
         <c-split :setting.sync="panel"></c-split>
         <c-panel :size="panel.right">
-          <span>Content: <br>{{resContent}}</span>
+          <c-content :content="resContent"></c-content>
         </c-panel>  
       </div>
     </main>
@@ -32,9 +25,11 @@ import Menu from './components/Menu.vue'
 import Panel from './components/Panel.vue'
 import Split from './components/Split.vue'
 import Footer from './components/Footer.vue'
-import Item from './components/Item.vue'
+import ReqList from './components/ReqList.vue'
+import Content from './components/Content.vue'
 
 const ipcRenderer = electron.ipcRenderer
+
 export default {
   name: 'App',
   components: {
@@ -43,7 +38,8 @@ export default {
     'c-split': Split,
     'c-panel': Panel,
     'c-footer': Footer,
-    'c-item': Item,
+    'c-req-list': ReqList,
+    'c-content': Content
   },
   props: {
   },
@@ -51,7 +47,6 @@ export default {
   },
   data () {
     return {
-      reqHead: config.reqHead,
       reqList: [],
       panel: {
         left: 50,
@@ -63,7 +58,6 @@ export default {
     }
   },
   ready () {
-    console.log('xxx')
     ipcRenderer.on('request', (event, request) => {
       console.log(event, request)
       this.reqList.push({
