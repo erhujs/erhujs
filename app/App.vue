@@ -19,8 +19,8 @@
       </c-panel>
     </section>
     <c-footer></c-footer>
-    <!-- <mdl-checkbox :checked.sync="checked">Checkbox</mdl-checkbox>
-    <mdl-button v-mdl-ripple-effect colored raised>Ripple Effect</mdl-button> -->
+    <mdl-checkbox :checked.sync="checked">Checkbox</mdl-checkbox>
+    <mdl-button v-mdl-ripple-effect colored raised>Ripple Effect</mdl-button>
   </div>
 </template>
 

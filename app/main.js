@@ -1,18 +1,16 @@
 /* eslint-disable */
-import './node_modules/material-design-lite/material.min.css'
+// material-design-lite lib
+import 'material-design-lite/material.min.css'
+import 'material-design-lite/material.min.js'
 
 import Vue from 'vue'
 import Vuex from 'vuex'
-import componentHandler from 'material-design-lite'
-// import VueMdl from 'vue-mdl'
+import VueMdl from 'vue-mdl'
 
 import App from './App'
 
-// Vue.use(VueMdl)
-// Make vue aware of Vuex
+Vue.use(VueMdl)
 Vue.use(Vuex)
-
-window.componentHandler = componentHandler
 
 new Vue({
   el: 'body',
