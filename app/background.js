@@ -56,7 +56,7 @@ proxy({
 	proxyReceived: (req) => {
 		mainWindow.webContents.send('proxyReceived', req)
 	},
-	beforeRequest: (req)=>{
+	beforeRequest: (req) => {
 		mainWindow.webContents.send('beforeRequest', req)
 	},
 	connect: (req) => {
@@ -65,8 +65,8 @@ proxy({
 	beforeReponse: (req, res) => {
 		mainWindow.webContents.send('beforeReponse', req, res)
 	},
-	reponse: (req, res) => {
-		mainWindow.webContents.send('reponse', req, res)
+	response: (req, res) => {
+		mainWindow.webContents.send('response', req, res)
 	},
 	reponseEnd: (req, res) => {
 		mainWindow.webContents.send('reponseEnd', req, res)

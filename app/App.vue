@@ -58,7 +58,7 @@ export default {
     }
   },
   ready () {
-    ipcRenderer.on('request', (event, request) => {
+    ipcRenderer.on('beforeRequest', (event, request) => {
       console.log(event, request)
       this.reqList.push({
         host: request.host,
