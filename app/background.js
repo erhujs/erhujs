@@ -19,7 +19,7 @@ function createWindow() {
 		'y': mainWindowState.y,
 		'width': mainWindowState.width,
 		'height': mainWindowState.height,
-		// frame: false,  // without header
+		frame: false,  // without header
 		// skipTaskbar: true,
 		// fullscreen: true
 	})
