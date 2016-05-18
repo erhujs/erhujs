@@ -1,7 +1,7 @@
 <template>
-  <div class="c-footer">
-    Footer
-  </div>
+  <footer class="mdl-mega-footer">
+    footer
+  </footer>
 </template>
 
 <script>

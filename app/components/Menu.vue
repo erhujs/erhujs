@@ -1,6 +1,12 @@
 <template>
-  <div class="c-menu">
-    Menu
+  <div class="c-menu mdl-layout__drawer">
+    <span class="mdl-layout-title">Title</span>
+    <nav class="mdl-navigation">
+      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Link</a>
+    </nav>
   </div>
 </template>
 
@@ -17,6 +23,5 @@ export default {
 </script>
 
 <style lang="stylus">
-.c-menu
-  border 1px solid #000
+  
 </style>

@@ -1,26 +1,26 @@
 <template>
-  <div>
+  <div class="mdl-layout mdl-js-layout">
     <c-header></c-header>
     <c-menu></c-menu>
-    <section class="container">
-      <c-panel :size="panel.left">
-        <ul class="req-list">
-          <li>
-            <c-item :req="reqHead" index="#"></c-item>
-          </li>
-          <li v-for="it in reqList">
-            <c-item :req="it"></c-item>
-          </li>
-        </ul>
-      </c-panel>
-      <c-split :setting.sync="panel"></c-split>
-      <c-panel :size="panel.right">
-        <span>Content: <br>{{resContent}}</span>
-      </c-panel>
-    </section>
+    <main class="mdl-layout__content">
+      <div class="page-content container">
+        <c-panel :size="panel.left">
+          <ul class="req-list">
+            <li>
+              <c-item :req="reqHead" index="#"></c-item>
+            </li>
+            <li v-for="it in reqList">
+              <c-item :req="it"></c-item>
+            </li>
+          </ul>
+        </c-panel>
+        <c-split :setting.sync="panel"></c-split>
+        <c-panel :size="panel.right">
+          <span>Content: <br>{{resContent}}</span>
+        </c-panel>  
+      </div>
+    </main>
     <c-footer></c-footer>
-    <mdl-checkbox :checked.sync="checked">Checkbox</mdl-checkbox>
-    <mdl-button v-mdl-ripple-effect colored raised>Ripple Effect</mdl-button>
   </div>
 </template>
 
