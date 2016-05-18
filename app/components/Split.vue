@@ -12,6 +12,7 @@
 export default {
   name: 'c-split',
   props: {
+    setting: Object
   },
   methods: {
     onMouseDown (e) {
