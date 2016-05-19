@@ -1,36 +1,7 @@
 <template>
-  <p-window>
-    <p-header title="erhu">
-      <div class="toolbar-actions">
-      <div class="btn-group">
-        <button class="btn btn-default">
-          <span class="icon icon-home"></span>
-        </button>
-        <button class="btn btn-default">
-          <span class="icon icon-folder"></span>
-        </button>
-        <button class="btn btn-default active">
-          <span class="icon icon-cloud"></span>
-        </button>
-        <button class="btn btn-default">
-          <span class="icon icon-popup"></span>
-        </button>
-        <button class="btn btn-default">
-          <span class="icon icon-shuffle"></span>
-        </button>
-      </div>
-
-      <button class="btn btn-default">
-        <span class="icon icon-home icon-text"></span>
-        Filters
-      </button>
-
-      <button class="btn btn-default btn-dropdown pull-right">
-        <span class="icon icon-megaphone"></span>
-      </button>
-    </div>
-    </p-header>
-    <p-content>
+  <div class="window">
+    <c-header></c-header>
+    <section class="window-content">
       <div class="pane pane-sm sidebar">
         <nav class="nav-group">
           <h5 class="nav-group-title">Favorites</h5>
@@ -114,32 +85,24 @@
           </li>
         </ul>
       </div>
-      
-    </p-content>
-    <p-footer>
-      <div class="toolbar-actions">
-        <button class="btn btn-default">
-          Cancel
-        </button>
-
-        <button class="btn btn-primary pull-right">
-          Save
-        </button>
-      </div>
-    </p-footer>
-  </p-window>
+    </section>
+    <c-footer></c-footer>
+  </div>
 </template>
 
 <script>
 import electron from 'electron'
 import config from './config.js'
+import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
 
 const ipcRenderer = electron.ipcRenderer
 
 export default {
   name: 'App',
   components: {
-
+    'c-header': Header,
+    'c-footer': Footer
   },
   props: {
   },

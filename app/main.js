@@ -1,4 +1,5 @@
 /* eslint-disable */
+import './main.styl'
 
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -10,7 +11,6 @@ Vue.use(Vuex)
 Vue.component('p-actionbar', photon.Actionbar)
 Vue.component('p-button', photon.Button)
 Vue.component('p-button-group', photon.ButtonGroup)
-Vue.component('p-content', photon.Content)
 Vue.component('p-checkbox', photon.CheckBox)
 Vue.component('p-icon', photon.Icon)
 Vue.component('p-input', photon.Input)
@@ -28,9 +28,6 @@ Vue.component('p-tab-group', photon.TabGroup)
 Vue.component('p-tabitem', photon.TabItem)
 Vue.component('p-table', photon.Table)
 Vue.component('p-textarea', photon.TextArea)
-Vue.component('p-header', photon.Header)
-Vue.component('p-footer', photon.Footer)
-Vue.component('p-window', photon.Window)
 
 new Vue({
   el: 'body',

@@ -2,7 +2,6 @@ import '../node_modules/photon/dist/css/photon.min.css'
 import Actionbar from './actionbar.vue'
 import Button from './button.vue'
 import ButtonGroup from './button-group.vue'
-import Content from './content.vue'
 import CheckBox from './checkbox.vue'
 import Icon from './icon.vue'
 import Input from './input.vue'
@@ -20,16 +19,12 @@ import TabGroup from './tab-group.vue'
 import TabItem from './tab-item.vue'
 import Table from './table.vue'
 import TextArea from './textarea.vue'
-import Header from './header.vue'
-import Footer from './footer.vue'
-import Window from './window.vue'
 
 
 export default {
   Actionbar,
   Button,
   ButtonGroup,
-  Content,
   CheckBox,
   Icon,
   Input,
@@ -46,8 +41,5 @@ export default {
   TabGroup,
   TabItem,
   Table,
-  TextArea,
-  Header,
-  Footer,
-  Window
+  TextArea
 }

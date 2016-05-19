@@ -15,15 +15,22 @@ function createWindow() {
 	})
 
 	mainWindow = new BrowserWindow({
-		'x': mainWindowState.x,
-		'y': mainWindowState.y,
-		'width': mainWindowState.width,
-		'height': mainWindowState.height,
-		frame: false,  // without header
-		// skipTaskbar: true,
-		// fullscreen: true
+		x: mainWindowState.x,
+		y: mainWindowState.y,
+		width: mainWindowState.width,
+		height: mainWindowState.height,
+		resizable: false,
+		center: true,
+    skipTaskbar: false,
+    maximizable: false,
+    fullscreenable: false,
+    autoHideMenuBar: true,
+    titleBarStyle: 'hidden-inset'
+    // frame: false
 	})
 
+	mainWindow.setMenu(null)
+	mainWindow.setMenuBarVisibility(false)
 	// Load the HTML file directly from the webpack dev server if
 	// hot reload is enabled, otherwise load the local file.
 	const mainURL = process.env.HOT
