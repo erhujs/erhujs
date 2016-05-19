@@ -1,3 +1,9 @@
+/**
+ * setting store
+ *
+ * @param
+ */
+
 import Vuex from 'vuex'
 import Vue from 'vue'
 

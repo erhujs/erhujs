@@ -13,6 +13,9 @@ import Header from './components/Header.vue'
 import Main from './components/Main.vue'
 import Footer from './components/Footer.vue'
 
+import { addReq } from './store/req/actions.js'
+import reqStore from './store/req/store.js'
+
 const ipcRenderer = electron.ipcRenderer
 
 export default {
@@ -22,33 +25,32 @@ export default {
     'c-main': Main,
     'c-footer': Footer
   },
-  props: {
-  },
-  computed: {
+  store: reqStore,
+  vuex: {
+    actions: {
+      addReq
+    }
   },
   data () {
     return {
       reqList: [],
-      resContent: '',
-      checked: false
+      resContent: ''
     }
   },
   ready () {
     ipcRenderer.on('beforeRequest', (event, request) => {
       console.log(event, request)
-      this.reqList.push({
-        host: request.host,
-        path: request.path,
-        server: request.server
-      })
+      this.addReq(request)
+      // this.reqList.push({
+      //   host: request.host,
+      //   path: request.path,
+      //   server: request.server
+      // })
     })
     ipcRenderer.on('response', (event, response) => {
       console.log(event, response)
       this.resContent = response.data.toString()
     })
-  },
-  methods: {
-
   }
 }
 </script>

@@ -1,15 +1,27 @@
 export default {
-  reqHead: {
-    index: '#',
-    result: 'Result',
-    protocol: 'Protocol',
-    host: 'Host',
-    url: 'URL',
-    body: 'Body',
-    caching: 'Caching',
-    contentType: 'Content-Type',
-    process: 'Process',
-    comments: 'Comments',
-    custom: 'Custom',
-  }
+  reqHead: [{
+    id: 'index',
+    name: '#',
+    width:'10px'
+  }, {
+    name: 'Result',
+  }, {
+    name: 'Protocol',
+  }, {
+    name: 'Host',
+  }, {
+    name: 'URL',
+  }, {
+    name: 'Body',
+  }, {
+    name: 'Caching',
+  }, {
+    name: 'Content-Type',
+  }, {
+    name: 'Process',
+  }, {
+    name: 'Comments',
+  }, {
+    name: 'Custom',
+  }]
 }

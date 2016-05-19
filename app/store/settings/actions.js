@@ -1,3 +1,9 @@
+/**
+ * setting actions
+ *
+ * 
+ */
+
 export const togglerBar = makeAction('TOGGLER_BAR')
 
 function makeAction (type) {
