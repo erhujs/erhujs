@@ -10,7 +10,7 @@ let mainWindow
 
 function createWindow() {
 	let mainWindowState = windowStateKeeper({
-		defaultWidth: 1200,
+		defaultWidth: 1000,
 		defaultHeight: 700
 	})
 

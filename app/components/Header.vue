@@ -2,6 +2,10 @@
   <header class="c-header toolbar toolbar-header">
     <h1 class="title">{{title}}</h1>
     <div class="toolbar-actions">
+      <button class="btn btn-default">
+        Collections
+      </button>
+
       <div class="btn-group">
         <button class="btn btn-default">
           <span class="icon icon-home"></span>
@@ -24,9 +28,21 @@
         <span class="icon icon-home icon-text"></span>
         Filters
       </button>
-
+      <button class="btn btn-default">
+        <span class="icon icon-trash"></span>
+      </button>
+      <button class="btn btn-default">
+        <span class="icon icon-arrows-ccw"></span>
+      </button>
+      <button class="btn btn-default">
+        <span class="icon icon-arrows-ccw"></span>
+      </button>
+      <button class="btn btn-default" data-balloon="Reflash" data-balloon-pos="down">
+        <span class="icon icon-cw"></span>
+      </button>
+      
       <button class="btn btn-default btn-dropdown pull-right">
-        <span class="icon icon-megaphone"></span>
+        <span class="icon icon-cog"></span>
       </button>
     </div>
   </header>

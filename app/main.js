@@ -1,4 +1,5 @@
 /* eslint-disable */
+import 'balloon-css/balloon.min.css'
 import './main.styl'
 
 import Vue from 'vue'

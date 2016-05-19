@@ -3,87 +3,13 @@
     <c-header></c-header>
     <section class="window-content">
       <div class="pane pane-sm sidebar">
-        <nav class="nav-group">
-          <h5 class="nav-group-title">Favorites</h5>
-          <a class="nav-group-item active">
-            <span class="icon icon-home"></span>
-            connors
-          </a>
-          <span class="nav-group-item">
-            <span class="icon icon-download"></span>
-            Downloads
-          </span>
-          <span class="nav-group-item">
-            <span class="icon icon-folder"></span>
-            Documents
-          </span>
-          <span class="nav-group-item">
-            <span class="icon icon-signal"></span>
-            AirPlay
-          </span>
-          <span class="nav-group-item">
-            <span class="icon icon-print"></span>
-            Applications
-          </span>
-          <span class="nav-group-item">
-            <span class="icon icon-cloud"></span>
-            Desktop
-          </span>
-        </nav>
+        <c-sidebar></c-sidebar>  
       </div>
       <div class="pane">
-        <table class="table-striped">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Kind</th>
-              <th>File Size</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>photon.css</td>
-              <td>CSS</td>
-              <td>28K</td>
-            </tr>
-            <tr>
-              <td>photon.css</td>
-              <td>CSS</td>
-              <td>28K</td>
-            </tr>
-            <tr>
-              <td>photon.css</td>
-              <td>CSS</td>
-              <td>28K</td>
-            </tr>
-            <tr>
-              <td>photon.css</td>
-              <td>CSS</td>
-              <td>28K</td>
-            </tr>
-          </tbody>
-        </table>
+        <c-main></c-main>
       </div>
       <div class="pane pane-sm">
-        <ul class="list-group">
-          <li class="list-group-header">
-            <input class="form-control" type="text" placeholder="Search for someone">
-          </li>
-          <li class="list-group-item">
-            <img class="img-circle media-object pull-left" src="http://photonkit.com/assets/img/avatar.jpg" width="32" height="32">
-            <div class="media-body">
-              <strong>List item title</strong>
-              <p>Lorem ipsum dolor sit amet.</p>
-            </div>
-          </li>
-          <li class="list-group-item">
-            <img class="img-circle media-object pull-left" src="http://photonkit.com/assets/img/avatar2.png" width="32" height="32">
-            <div class="media-body">
-              <strong>List item title</strong>
-              <p>Lorem ipsum dolor sit amet.</p>
-            </div>
-          </li>
-        </ul>
+        <c-content></c-content>
       </div>
     </section>
     <c-footer></c-footer>
@@ -94,6 +20,9 @@
 import electron from 'electron'
 import config from './config.js'
 import Header from './components/Header.vue'
+import Sidebar from './components/Sidebar.vue'
+import Main from './components/Main.vue'
+import Content from './components/Content.vue'
 import Footer from './components/Footer.vue'
 
 const ipcRenderer = electron.ipcRenderer
@@ -102,7 +31,10 @@ export default {
   name: 'App',
   components: {
     'c-header': Header,
-    'c-footer': Footer
+    'c-footer': Footer,
+    'c-sidebar': Sidebar,
+    'c-main': Main,
+    'c-content': Content
   },
   props: {
   },
