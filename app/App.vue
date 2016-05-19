@@ -1,17 +1,7 @@
 <template>
   <div class="window">
     <c-header></c-header>
-    <section class="window-content">
-      <div class="pane pane-sm sidebar">
-        <c-sidebar></c-sidebar>  
-      </div>
-      <div class="pane">
-        <c-main></c-main>
-      </div>
-      <div class="pane pane-sm">
-        <c-content></c-content>
-      </div>
-    </section>
+    <c-main></c-main>
     <c-footer></c-footer>
   </div>
 </template>
@@ -20,9 +10,7 @@
 import electron from 'electron'
 import config from './config.js'
 import Header from './components/Header.vue'
-import Sidebar from './components/Sidebar.vue'
 import Main from './components/Main.vue'
-import Content from './components/Content.vue'
 import Footer from './components/Footer.vue'
 
 const ipcRenderer = electron.ipcRenderer
@@ -31,10 +19,8 @@ export default {
   name: 'App',
   components: {
     'c-header': Header,
-    'c-footer': Footer,
-    'c-sidebar': Sidebar,
     'c-main': Main,
-    'c-content': Content
+    'c-footer': Footer
   },
   props: {
   },

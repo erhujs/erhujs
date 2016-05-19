@@ -2,8 +2,8 @@
   <header class="c-header toolbar toolbar-header">
     <h1 class="title">{{title}}</h1>
     <div class="toolbar-actions">
-      <button class="btn btn-default">
-        Collections
+      <button class="btn btn-default" @click="togglerBar">
+        SiderBar
       </button>
 
       <div class="btn-group">
@@ -49,6 +49,8 @@
 </template>
 
 <script>
+import { togglerBar } from '../store/settings/actions.js'
+import settingsStore from '../store/settings/store.js'
 
 export default {
   name: 'c-header',
@@ -56,10 +58,18 @@ export default {
   },
   computed: {
   },
+  store: settingsStore,
+  vuex: {
+    getters:{
+      barStatus: state => state.bar
+    },
+    actions: {
+      togglerBar
+    }
+  },
   data () {
     return {
-      title: 'Header',
-      disabled: false
+      title: 'Header'
     }
   },
   methods: {
@@ -78,6 +88,7 @@ export default {
     left 45%
     line-height 20px
     margin-top 6px
+    display none
   .toolbar-actions
     margin-top 6px
     margin-left 80px

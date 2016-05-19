@@ -1,45 +1,36 @@
 <template>
-  <div class="c-main">
-    <table class="table-striped">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Kind</th>
-          <th>File Size</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>photon.css</td>
-          <td>CSS</td>
-          <td>28K</td>
-        </tr>
-        <tr>
-          <td>photon.css</td>
-          <td>CSS</td>
-          <td>28K</td>
-        </tr>
-        <tr>
-          <td>photon.css</td>
-          <td>CSS</td>
-          <td>28K</td>
-        </tr>
-        <tr>
-          <td>photon.css</td>
-          <td>CSS</td>
-          <td>28K</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <section class="window-content c-main">
+    <div class="pane pane-sm sidebar" v-show="barStatus">
+      <c-sidebar></c-sidebar>  
+    </div>
+    <div class="pane">
+      <c-request></c-request>
+    </div>
+    <div class="pane pane-sm">
+      <c-content></c-content>
+    </div>
+  </section>
 </template>
 
 <script>
+import Sidebar from './Sidebar.vue'
+import Request from './Request.vue'
+import Content from './Content.vue'
+
+import settingsStore from '../store/settings/store.js'
 
 export default {
   name: 'c-main',
-  props: {
-    setting: Object
+  components: {
+    'c-sidebar': Sidebar,
+    'c-request': Request,
+    'c-content': Content
+  },
+  store: settingsStore,
+  vuex: {
+    getters:{
+      barStatus: state => state.bar
+    }
   },
   methods: {
   }
