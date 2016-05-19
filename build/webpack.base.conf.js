@@ -90,7 +90,8 @@ module.exports = {
       'clipboard',
       'crash-reporter',
       'screen',
-      'shell'
+      'shell',
+      'express'
     ])
   ],
   vue: {
