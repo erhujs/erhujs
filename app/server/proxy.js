@@ -3,7 +3,9 @@
 const http = require('http')
 const express = require('express')
 const url = require('url')
+const fs = require('fs')
 const shortid = require('shortid')
+const httpolyglot = require('httpolyglot')
 
 function safeCall(fn) {
 	if (typeof fn != 'function') return
@@ -13,12 +15,16 @@ function safeCall(fn) {
 }
 
 function proxy(options) {
-	const server = express()
+	// const server = express()
 
 	/**
 	 * Handle proxy request
 	 */
-	server.use((req, res) => {
+	const server = httpolyglot.createServer({
+		key: fs.readFileSync(__dirname+'/../app/server/certs/private/ca.key.pem'),
+  		cert: fs.readFileSync(__dirname+'/../app/server/certs/certs/ca.cert.pem'),
+  		passphrase: '7kPgE4YuY'
+	}, (req, res) => {
 		console.log('Request', req.url)
 		var urlObj = url.parse(req.url)
 		var host = req.headers.host || urlObj.host
@@ -83,9 +89,9 @@ function proxy(options) {
 
 		req.on('data', function(buf) {
 			proxy.write(buf)
-				/**
-				 * @event proxyReceive
-				 */
+			/**
+			 * @event proxyReceive
+			 */
 			request.body = Buffer.concat([request.body, buf], request.body.length + buf.length)
 			safeCall(options.proxyReceive, request)
 		})

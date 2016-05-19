@@ -104,4 +104,8 @@ response {
 	完成响应body接收后触发。`触发一次`
 
 
+### Documents
 
+* [create-a-self-signed-certificate-with-openssl](http://stackoverflow.com/questions/10175812/how-to-create-a-self-signed-certificate-with-openssl)
+
+* [OpenSSL Certificate Authority](https://jamielinux.com/docs/openssl-certificate-authority/create-the-root-pair.html#verify-the-root-certificate)
