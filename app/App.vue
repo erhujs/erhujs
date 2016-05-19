@@ -8,7 +8,7 @@
 
 <script>
 import electron from 'electron'
-import config from './config.js'
+
 import Header from './components/Header.vue'
 import Main from './components/Main.vue'
 import Footer from './components/Footer.vue'
@@ -29,11 +29,6 @@ export default {
   data () {
     return {
       reqList: [],
-      panel: {
-        left: 50,
-        right: 50,
-        minSize: 100
-      },
       resContent: '',
       checked: false
     }

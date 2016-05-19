@@ -3,7 +3,7 @@
     <table class="table-striped">
       <thead>
         <tr>
-          <th>Name</th>
+          <th>Name <span class="icon icon-down-open-mini pull-right"></span></th>
           <th>Kind</th>
           <th>File Size</th>
         </tr>

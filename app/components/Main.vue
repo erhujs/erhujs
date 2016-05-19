@@ -32,6 +32,16 @@ export default {
       barStatus: state => state.bar
     }
   },
+  data () {
+    return {
+      panel: {
+        left: 20,
+        middle: 60, 
+        right: 20,
+        minSize: 100
+      }
+    }
+  },
   methods: {
   }
 }
