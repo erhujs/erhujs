@@ -2,6 +2,7 @@
 
 const MITMProxy = require('http-mitm-proxy');
 const EventEmitter = require('events');
+const path = require('path')
 const CapturedConnection = require('./captured-connection');
 const getTime = require('./init-time');
 
@@ -17,16 +18,21 @@ class TrafficInterceptor extends EventEmitter {
 
         let proxy = new MITMProxy();
 
+
         proxy.onRequest(handleIncomingRequest.bind(this));
         proxy.onResponse(handleIncomingResponse.bind(this));
         proxy.onError(handleProxyError.bind(this));
 
         proxy.listen({
-            port: options.port,
-            sslCaDir: options.sslCaDir,
-            forceSNI: true,
-            httpsPort: 8889
+          slient: true,
+          port: options.port,
+          sslCaDir: options.sslCaDir,
+          forceSNI: true,
+          httpsPort: 8889
         });
+        setTimeout(function () {
+          require('child_process').exec('open "' + path.join(proxy.ca.certsFolder, 'ca.pem')+'"')
+        }, 500)
     }
 
     getConnection(id) {

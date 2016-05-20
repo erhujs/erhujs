@@ -31,7 +31,7 @@ module.exports = function(UIProcess, options) {
       }
     })
     .on('log', (msg) => {
-      console.log(chalk.blue('FEConnection: ') + msg);
+      // console.log(chalk.blue('FEConnection: ') + msg);
     });
 
   // this part is responsible for capturing traffic
