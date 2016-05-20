@@ -1,10 +1,11 @@
 {
-  "main": "dist/background.js",
+  "main": "app/background.js",
   "scripts": {
     "postinstall": "cd app && npm install",
     "start": "node build/dev-runner.js",
     "dev:server": "node build/dev-server.js",
-    "dev:client": "HOT=1 webpack --hide-modules --config build/webpack.dev-background.conf.js && HOT=1 electron .",
+    "dev:client2": "HOT=1 webpack --hide-modules --config build/webpack.dev-background.conf.js && HOT=1 electron .",
+    "dev:client": "HOT=1 PORT=8887 electron ./app/background.js",
     "build": "rimraf dist && mkdirp dist && NODE_ENV=production webpack --progress --hide-modules --config build/webpack.prod.conf.js",
     "package": "node build/package.js",
     "package:osx": "node build/package.js --platform=darwin --arch=x64",

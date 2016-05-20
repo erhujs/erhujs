@@ -46,7 +46,7 @@ function createWindow() {
 	const mainURL = process.env.HOT
 		? `http://localhost:${process.env.PORT}/main.html`
 		: 'file://' + path.join(__dirname, 'main.html')
-
+	console.log(mainURL)
 	mainWindow.loadURL(mainURL)
 
 	mainWindow.webContents.openDevTools()
