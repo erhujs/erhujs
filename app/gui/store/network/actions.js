@@ -5,10 +5,10 @@
  */
 
 
-export const addReq = makeAction('ADD_REQUEST')
-export const deleteReq = makeAction('DELETE_REQUEST')
-export const toggleReq = makeAction('TOGGLE_REQUEST')
-export const editReq = makeAction('EDIT_REQUEST')
+export const addNet = makeAction('ADD_NETWORK')
+export const deleteNet = makeAction('DELETE_NETWORK')
+export const toggleNet = makeAction('TOGGLE_NETWORK')
+export const editNet = makeAction('EDIT_NETWORK')
 export const toggleAll = makeAction('TOGGLE_ALL')
 export const clearCompleted = makeAction('CLEAR_COMPLETED')
 

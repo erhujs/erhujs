@@ -4,7 +4,7 @@
       <c-sidebar></c-sidebar>  
     </div>
     <div class="pane">
-      <c-request></c-request>
+      <c-network></c-network>
     </div>
     <div class="pane pane-sm">
       <c-content></c-content>
@@ -14,7 +14,7 @@
 
 <script>
 import Sidebar from './Sidebar.vue'
-import Request from './Request.vue'
+import Network from './Network.vue'
 import Content from './Content.vue'
 
 import settingsStore from '../store/settings/store.js'
@@ -23,7 +23,7 @@ export default {
   name: 'c-main',
   components: {
     'c-sidebar': Sidebar,
-    'c-request': Request,
+    'c-network': Network,
     'c-content': Content
   },
   store: settingsStore,

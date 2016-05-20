@@ -13,8 +13,8 @@ import Header from './components/Header.vue'
 import Main from './components/Main.vue'
 import Footer from './components/Footer.vue'
 
-import { addReq } from './store/req/actions.js'
-import reqStore from './store/req/store.js'
+import { addNet } from './store/network/actions.js'
+import networkStore from './store/network/store.js'
 
 const ipcRenderer = electron.ipcRenderer
 
@@ -25,10 +25,10 @@ export default {
     'c-main': Main,
     'c-footer': Footer
   },
-  store: reqStore,
+  store: networkStore,
   vuex: {
     actions: {
-      addReq
+      addNet
     }
   },
   data () {
@@ -38,21 +38,27 @@ export default {
     }
   },
   ready () {
+    
     ipcRenderer.on('beforeRequest', (event, request) => {
-      console.log(event, request)
-      this.addReq(request)
-      // this.reqList.push({
-      //   host: request.host,
-      //   path: request.path,
-      //   server: request.server
-      // })
+      console.log(JSON.stringify(request))
+      this.addNet(request)
     })
     ipcRenderer.on('response', (event, response) => {
-      console.log(event, response)
+      // console.log(event, response)
       this.resContent = response.data.toString()
     })
+    mock(this)
   }
 }
+
+function mock(vm){
+  vm.addNet(JSON.parse('{"body":{"type":"Buffer","data":[]},"headers":{"accept":"*/*","host":"lib.sinaapp.com","proxy-connection":"Keep-Alive","user-agent":"curl/7.43.0"},"host":"lib.sinaapp.com","id":"SJg51aE2f","method":"GET","path":"http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js","port":80}'))
+
+  vm.addNet(JSON.parse('{"body":{"type":"Buffer","data":[]},"headers":{"accept":"*/*","host":"lib.sinaapp.com","proxy-connection":"Keep-Alive","user-agent":"curl/7.43.0"},"host":"lib.sinaapp.com","id":"SJg51aE2f","method":"GET","path":"http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js","port":80}'))
+
+  vm.addNet(JSON.parse('{"body":{"type":"Buffer","data":[]},"headers":{"accept":"*/*","host":"lib.sinaapp.com","proxy-connection":"Keep-Alive","user-agent":"curl/7.43.0"},"host":"lib.sinaapp.com","id":"SJg51aE2f","method":"GET","path":"http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js","port":80}'))
+}
+
 </script>
 
 <style lang="stylus">

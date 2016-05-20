@@ -13,20 +13,20 @@ const state = {
 }
 
 const mutations = {
-  ADD_REQUEST (state, req) {
+  ADD_NETWORK (state, req) {
     console.log(req)
     state.lists.push(parser(req))
   },
 
-  DELETE_REQUEST (state, req) {
+  DELETE_NETWORK (state, req) {
     state.lists.$remove(req)
   },
 
-  TOGGLE_REQUEST (state, req) {
+  TOGGLE_NETWORK (state, req) {
     req.done = !req.done
   },
 
-  EDIT_REQUEST (state, req, text) {
+  EDIT_NETWORK (state, req, text) {
     req.text = text
   },
 
