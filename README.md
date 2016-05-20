@@ -75,17 +75,18 @@ response {
 
 #### Events
 
-* **request-data**(req)
-
-	接收到请求body时触发，用于获取如Post请求的请求体。`多次触发`
-
-* **request-end**(req)
-
-	已完整获取请求body时触发。`触发一次`
 
 * **request**(req)
 
-	发送代理请求前触发，可能在 proxyReceived 之前。`触发一次`
+  发送代理请求前触发，可能在 request-data 之前。`触发一次`
+
+* **request-data**(req)
+
+	接收到请求body时触发，用于获取如 POST 的请求体。`多次触发`
+
+* **request-end**(req)
+
+	已完整获取请求 body 时触发。`触发一次`
 
 * **connected**(req)
 
@@ -101,7 +102,7 @@ response {
 
 * **response-end**(req, res)
 
-	完成响应body接收后触发。`触发一次`
+	完成响应 body 接收后触发。`触发一次`
 
 
 ### Documents

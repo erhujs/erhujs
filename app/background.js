@@ -45,22 +45,22 @@ function createWindow() {
       mainWindow.webContents.send('request', req)
     },
     onRequestData: (req) => {
-      mainWindow.webContents.send('proxyReceived', req)
+      mainWindow.webContents.send('request-data', req)
     },
     onRequestEnd: (req) => {
-      mainWindow.webContents.send('beforeRequest', req)
+      mainWindow.webContents.send('request-end', req)
     },
     connected: (req) => {
       mainWindow.webContents.send('connected', req)
     },
     onResponse: (req, res) => {
-      mainWindow.webContents.send('onResponse', req, res)
+      mainWindow.webContents.send('response', req, res)
     },
     onResponseData: (req, res) => {
-      mainWindow.webContents.send('onResponseData', req, res)
+      mainWindow.webContents.send('response-data', req, res)
     },
     onResponseEnd: (req, res) => {
-      mainWindow.webContents.send('onResponseEnd', req, res)
+      mainWindow.webContents.send('response-end', req, res)
     }
   })
 	// netproxy(mainWindow.webContents, options)
