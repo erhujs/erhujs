@@ -1,3 +1,5 @@
+'use strict'
+
 const path = require('path')
 const electron = require('electron')
 const windowStateKeeper = require('electron-window-state')
@@ -5,6 +7,8 @@ const ipcMain = electron.ipcMain
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const proxy = require('./server/proxy')
+const netproxy = require('./server/netproxy')
+const argv = require('minimist')(process.argv.slice(2));
 
 let mainWindow
 
@@ -14,6 +18,7 @@ function createWindow() {
 		defaultHeight: 700
 	})
 
+
 	mainWindow = new BrowserWindow({
 		x: mainWindowState.x,
 		y: mainWindowState.y,
@@ -21,12 +26,17 @@ function createWindow() {
 		height: mainWindowState.height,
 		resizable: false,
 		center: true,
-    skipTaskbar: false,
-    maximizable: false,
-    fullscreenable: false,
-    autoHideMenuBar: true,
-    titleBarStyle: 'hidden-inset'
-    // frame: false
+		skipTaskbar: false,
+		maximizable: false,
+		fullscreenable: false,
+		autoHideMenuBar: true,
+		titleBarStyle: 'hidden-inset'
+		// frame: false
+	})
+	// setup proxy server
+	netproxy(mainWindow.webContents, {
+		port: argv['proxy-port'] || 8888,
+		sslCaDir: argv['ssl-ca-dir'] || path.resolve(app.getPath('userData'), 'ssl')
 	})
 
 	mainWindow.setMenu(null)
@@ -56,26 +66,26 @@ app.on('window-all-closed', function () {
 	}
 })
 
-proxy({
-	proxyReceive: (req) => {
-		mainWindow.webContents.send('proxyReceive', req)
-	},
-	proxyReceived: (req) => {
-		mainWindow.webContents.send('proxyReceived', req)
-	},
-	beforeRequest: (req) => {
-		mainWindow.webContents.send('beforeRequest', req)
-	},
-	connect: (req) => {
-		mainWindow.webContents.send('connect', req)
-	},
-	beforeReponse: (req, res) => {
-		mainWindow.webContents.send('beforeReponse', req, res)
-	},
-	response: (req, res) => {
-		mainWindow.webContents.send('response', req, res)
-	},
-	reponseEnd: (req, res) => {
-		mainWindow.webContents.send('reponseEnd', req, res)
-	}
-})
+// proxy({
+// 	proxyReceive: (req) => {
+// 		mainWindow.webContents.send('proxyReceive', req)
+// 	},
+// 	proxyReceived: (req) => {
+// 		mainWindow.webContents.send('proxyReceived', req)
+// 	},
+// 	beforeRequest: (req) => {
+// 		mainWindow.webContents.send('beforeRequest', req)
+// 	},
+// 	connect: (req) => {
+// 		mainWindow.webContents.send('connect', req)
+// 	},
+// 	beforeReponse: (req, res) => {
+// 		mainWindow.webContents.send('beforeReponse', req, res)
+// 	},
+// 	response: (req, res) => {
+// 		mainWindow.webContents.send('response', req, res)
+// 	},
+// 	reponseEnd: (req, res) => {
+// 		mainWindow.webContents.send('reponseEnd', req, res)
+// 	}
+// })
