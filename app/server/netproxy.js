@@ -1,7 +1,6 @@
 'use strict'
 
-const path = require('path');
-const argv = require('minimist')(process.argv.slice(2));
+const chalk = require('chalk')
 const FrontEndConnection = require('./lib/front-end-connection');
 const TrafficInterceptor = require('./lib/traffic-interceptor');
 const RDPMessageFormatter = require('./lib/rdp-message-formatter');
