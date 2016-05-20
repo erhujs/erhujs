@@ -1,6 +1,7 @@
 'use strict'
 
 const http = require('http')
+const https = require('https')
 const express = require('express')
 const url = require('url')
 const fs = require('fs')
@@ -23,7 +24,8 @@ function proxy(options) {
 	const server = httpolyglot.createServer({
 		key: fs.readFileSync(__dirname+'/../app/server/certs/private/ca.key.pem'),
   		cert: fs.readFileSync(__dirname+'/../app/server/certs/certs/ca.cert.pem'),
-  		passphrase: '7kPgE4YuY'
+  		passphrase: '7kPgE4YuY',
+  		rejectUnauthorized: false
 	}, (req, res) => {
 		console.log('Request', req.url)
 		var urlObj = url.parse(req.url)
