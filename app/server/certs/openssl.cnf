@@ -78,10 +78,10 @@ commonName                      = Erhu
 emailAddress                    =
 
 # Optionally, specify some defaults.
-countryName_default             = GB
-stateOrProvinceName_default     = England
-localityName_default            =
-0.organizationName_default      = Alice Ltd
+countryName_default             = CN
+stateOrProvinceName_default     = GuangDong
+localityName_default            = ShenZhen
+0.organizationName_default      = Erhujs
 organizationalUnitName_default  =
 emailAddress_default            =
 
