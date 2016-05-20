@@ -38,8 +38,8 @@ export default {
     }
   },
   ready () {
-    
-    ipcRenderer.on('beforeRequest', (event, request) => {
+
+    ipcRenderer.on('request', (event, request) => {
       console.log(JSON.stringify(request))
       this.addNet(request)
     })

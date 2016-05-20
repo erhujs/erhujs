@@ -40,7 +40,30 @@ function createWindow() {
 		// frame: false
 	})
 	// setup proxy server
-	netproxy(mainWindow.webContents, options)
+  proxy(options, {
+    onRequest: (req) => {
+      mainWindow.webContents.send('request', req)
+    },
+    onRequestData: (req) => {
+      mainWindow.webContents.send('proxyReceived', req)
+    },
+    onRequestEnd: (req) => {
+      mainWindow.webContents.send('beforeRequest', req)
+    },
+    connected: (req) => {
+      mainWindow.webContents.send('connected', req)
+    },
+    onResponse: (req, res) => {
+      mainWindow.webContents.send('onResponse', req, res)
+    },
+    onResponseData: (req, res) => {
+      mainWindow.webContents.send('onResponseData', req, res)
+    },
+    onResponseEnd: (req, res) => {
+      mainWindow.webContents.send('onResponseEnd', req, res)
+    }
+  })
+	// netproxy(mainWindow.webContents, options)
 
 	// mainWindow.setMenu(null)
 	// mainWindow.setMenuBarVisibility(false)
@@ -63,7 +86,7 @@ function createWindow() {
 	})
 
 	const menuTemplate = require('./server/menu')(app, options)
-  
+
   console.log(menuTemplate)
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
@@ -76,27 +99,3 @@ app.on('window-all-closed', function () {
 		app.quit()
 	}
 })
-
-// proxy({
-// 	proxyReceive: (req) => {
-// 		mainWindow.webContents.send('proxyReceive', req)
-// 	},
-// 	proxyReceived: (req) => {
-// 		mainWindow.webContents.send('proxyReceived', req)
-// 	},
-// 	beforeRequest: (req) => {
-// 		mainWindow.webContents.send('beforeRequest', req)
-// 	},
-// 	connect: (req) => {
-// 		mainWindow.webContents.send('connect', req)
-// 	},
-// 	beforeReponse: (req, res) => {
-// 		mainWindow.webContents.send('beforeReponse', req, res)
-// 	},
-// 	response: (req, res) => {
-// 		mainWindow.webContents.send('response', req, res)
-// 	},
-// 	reponseEnd: (req, res) => {
-// 		mainWindow.webContents.send('reponseEnd', req, res)
-// 	}
-// })

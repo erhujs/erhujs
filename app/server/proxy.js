@@ -7,121 +7,117 @@ const url = require('url')
 const fs = require('fs')
 const shortid = require('shortid')
 const httpolyglot = require('httpolyglot')
+const MITMProxy = require('http-mitm-proxy');
+const debug = require('debug')('Proxy')
 
 function safeCall(fn) {
-	if (typeof fn != 'function') return
+  if (typeof fn != 'function') return
 
-	var args = [].slice.call(arguments, 1)
-	return fn.apply(null, args)
+  var args = [].slice.call(arguments, 1)
+  return fn.apply(null, args)
 }
 
-function proxy(options) {
-	// const server = express()
+function createProxy(opts, callbacks) {
+  let proxy = new MITMProxy()
 
-	/**
-	 * Handle proxy request
-	 */
-	const server = httpolyglot.createServer({
-		key: fs.readFileSync(__dirname+'/../app/server/certs/private/ca.key.pem'),
-  		cert: fs.readFileSync(__dirname+'/../app/server/certs/certs/ca.cert.pem'),
-  		passphrase: '7kPgE4YuY',
-  		rejectUnauthorized: false
-	}, (req, res) => {
-		console.log('Request', req.url)
-		var urlObj = url.parse(req.url)
-		var host = req.headers.host || urlObj.host
-		var port = url.parse(host).port || 80
-		var method = req.method
+  proxy.onError((ctx, err, cb) => {
+    debug('Error', err)
+    return cb()
+  })
+  proxy.onRequest(function (ctx, calback) {
+    const id = shortid.generate()
+    let req = ctx.clientToProxyRequest
+    let urlObj = url.parse(req.url)
+    let host = req.headers.host || urlObj.host
+    let port = url.parse(host).port || 80
+    let method = req.method
 
-		// reset port
-		urlObj.port = port
-			// prevent repeat port
-		if (port == 80) {
-			urlObj.port = ''
-		}
+    debug('#'+id, 'onRequest', req.url)
 
-		const id = shortid.generate()
-		var reqOpts = {
-			host,
-			port,
-			method,
-			path: url.format(urlObj),
-			headers: req.headers
-		}
-		var request = Object.assign({
-			id,
-			body: new Buffer('')
-		}, reqOpts)
+    let request = {
+      id,
+      host,
+      port,
+      method,
+      protocol: ctx.isSSL ? 'https' : 'http',
+      path: url.format(urlObj),
+      headers: req.headers,
+      body: new Buffer('')
+    }
+    /**
+     * @event request
+     */
+    safeCall(callbacks.onRequest, request)
+    /**
+     * @event onRequestData
+     */
+    ctx.onRequestData((ctx, chunk, cb) => {
+      debug('#'+id, 'onRequestData', chunk.length)
 
-		/**
-		 * @event beforeRequest
-		 */
-		safeCall(options.beforeRequest, request)
-		var proxy = http.request(reqOpts, (proxyRes) => {
-			request.server = proxy.connection.remoteAddress
-				// remote ip
-			var response = {
-					id,
-					headers: proxyRes.headers,
-					data: new Buffer('')
-				}
-				/**
-				 * @event beforeReponse
-				 */
-			safeCall(options.beforeReponse, request, response)
-			proxyRes.on('data', (data) => {
-				response.data = Buffer.concat([response.data, data], response.data.length + data.length)
-					// emit response
-				res.write(data)
-					/**
-					 * @event response
-					 */
-				safeCall(options.reponse, request, response)
-			})
-			proxyRes.on('end', () => {
-				console.log('#' + id, 'Request End...')
-					// emit response end
-				res.end()
-					/**
-					 * @event reponseEnd
-					 */
-				safeCall(options.reponseEnd, request, response)
-			})
-		})
+      request.body = Buffer.concat([request.body, chunk], request.body.length + chunk.length)
+      safeCall(callbacks.onRequestData, request)
+      return cb(null, chunk)
+    })
+    /**
+     * @event onRequestEnd
+     */
+    ctx.onRequestEnd((ctx, cb) => {
+      debug('#'+id, 'onRequestEnd')
 
-		req.on('data', function(buf) {
-			proxy.write(buf)
-			/**
-			 * @event proxyReceive
-			 */
-			request.body = Buffer.concat([request.body, buf], request.body.length + buf.length)
-			safeCall(options.proxyReceive, request)
-		})
+      safeCall(callbacks.onRequestEnd, request)
+      return cb()
+    })
+    /**
+     * @event onResponse
+     */
+    var response = {
+      id,
+      data: new Buffer('')
+    }
+    ctx.onResponse((ctx, cb) => {
 
-		req.on('end', function() {
-			/**
-			 * @event proxyReceived
-			 */
-			safeCall(options.proxyReceived, request)
-			proxy.end()
-		})
+      let proxyReq = ctx.proxyToServerRequest
+      let proxyRes = ctx.serverToProxyResponse
 
-		// request connected
-		proxy.on('socket', (socket) => {
-			socket.on('connect', () => {
-				/**
-				 * @event connect
-				 */
-				request.server = socket.remoteAddress
-				safeCall(options.connect, request)
-			})
-		})
-	})
+      request.server = proxyReq.connection.remoteAddress
+      response.headers = proxyRes.headers
 
+      debug('#'+id, 'onResponse', request.server)
+      safeCall(callbacks.onResponse, request, response)
+      return cb()
+    })
+    ctx.onResponseData((ctx, chunk, cb) => {
+      response.data = Buffer.concat([response.data, chunk], response.data.length + chunk.length)
+      safeCall(callbacks.onResponseData, request, response)
+      return cb(null, chunk)
+    })
+    ctx.onResponseEnd((ctx, cb) => {
+      debug('#'+id, 'onResponseEnd')
+      safeCall(callbacks.onResponseEnd, request, response)
+      return cb()
+    })
+    /**
+     * Erhu extend method
+     * @event connected
+     */
+    req.on('socket', (socket) => {
+      socket.on('connected', () => {
+        request.server = socket.remoteAddress
+        safeCall(callbacks.connected, request)
+      })
+    })
 
-	var port = 8888
-	server.listen(port, () => {
-		console.log('Proxy server listen on', port)
-	})
+    return calback()
+
+  })
+
+  proxy.listen({
+    slient: true,
+    port: opts.port,
+    sslCaDir: opts.sslCaDir,
+    forceSNI: true,
+    httpsPort: 8889
+  })
+
 }
-module.exports = proxy
+module.exports = createProxy
