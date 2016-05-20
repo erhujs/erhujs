@@ -1,5 +1,5 @@
 export default {
-  reqHead: [{
+  netHead: [{
     id: 'index',
     name: '#',
     width:'10px'

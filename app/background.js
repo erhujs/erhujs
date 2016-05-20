@@ -5,10 +5,16 @@ const electron = require('electron')
 const windowStateKeeper = require('electron-window-state')
 const ipcMain = electron.ipcMain
 const app = electron.app
+const Menu = electron.Menu
 const BrowserWindow = electron.BrowserWindow
 const proxy = require('./server/proxy')
 const netproxy = require('./server/netproxy')
 const argv = require('minimist')(process.argv.slice(2));
+
+const options = {
+	port: argv['proxy-port'] || 8888,
+	sslCaDir: argv['ssl-ca-dir'] || path.resolve(app.getPath('userData'), 'ssl')
+}
 
 let mainWindow
 
@@ -34,19 +40,18 @@ function createWindow() {
 		// frame: false
 	})
 	// setup proxy server
-	netproxy(mainWindow.webContents, {
-		port: argv['proxy-port'] || 8888,
-		sslCaDir: argv['ssl-ca-dir'] || path.resolve(app.getPath('userData'), 'ssl')
-	})
+	netproxy(mainWindow.webContents, options)
 
-	mainWindow.setMenu(null)
-	mainWindow.setMenuBarVisibility(false)
+	// mainWindow.setMenu(null)
+	// mainWindow.setMenuBarVisibility(false)
+
 	// Load the HTML file directly from the webpack dev server if
 	// hot reload is enabled, otherwise load the local file.
 	const mainURL = process.env.HOT
 		? `http://localhost:${process.env.PORT}/main.html`
 		: 'file://' + path.join(__dirname, 'main.html')
 	console.log(mainURL)
+
 	mainWindow.loadURL(mainURL)
 
 	mainWindow.webContents.openDevTools()
@@ -56,6 +61,12 @@ function createWindow() {
 		// Dereference
 		mainWindow = null
 	})
+
+	const menuTemplate = require('./server/menu')(app, options)
+  
+  console.log(menuTemplate)
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
 }
 
 app.on('ready', createWindow)

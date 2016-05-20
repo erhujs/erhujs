@@ -9,7 +9,7 @@
           <colgroup></colgroup>
           <tbody>
             <tr>
-              <th class="net-th" v-for="it in reqHead">
+              <th class="net-th" v-for="it in netHead">
                 {{it.name}}
                 <span class="icon icon-down-open-mini to-right"></span>
               </th>
@@ -50,7 +50,7 @@ export default {
   },
   data () {
     return {
-      reqHead: config.reqHead
+      netHead: config.netHead
     }
   },
   store: networkStore,
