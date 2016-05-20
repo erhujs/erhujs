@@ -1,4 +1,4 @@
-import '../node_modules/photon/dist/css/photon.min.css'
+import 'photon/dist/css/photon.min.css'
 import Actionbar from './actionbar.vue'
 import Button from './button.vue'
 import ButtonGroup from './button-group.vue'

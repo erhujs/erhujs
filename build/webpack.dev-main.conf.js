@@ -11,7 +11,7 @@ var webpackConfig = merge(webpackBaseConfig, {
   entry: {
     app: [
       './build/dev-client?path=' + devServerUrl + '__webpack_hmr&noInfo=true&reload=true',
-      './app/main.js'
+      './app/gui/main.js'
     ]
   },
   // eval-source-map is faster for development
@@ -42,7 +42,7 @@ var webpackConfig = merge(webpackBaseConfig, {
     // https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
       filename: 'main.html',
-      template: './app/main.html',
+      template: './app/gui/main.html',
       excludeChunks: ['devtools'],
       inject: true
     })

@@ -10,7 +10,7 @@ var cssLoaders = require('./css-loaders')
 
 module.exports = merge(baseWebpackConfig, {
   entry: {
-    app: './app/main.js',
+    app: './app/gui/main.js',
     background: './app/background.js'
   },
   devtool: config.build.productionSourceMap ? '#source-map' : false,
@@ -48,7 +48,7 @@ module.exports = merge(baseWebpackConfig, {
     // see https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
       filename: 'main.html',
-      template: './app/main.html',
+      template: './app/gui/main.html',
       excludeChunks: ['background'],
       inject: true,
       minify: {
