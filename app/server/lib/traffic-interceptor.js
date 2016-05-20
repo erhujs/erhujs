@@ -9,111 +9,111 @@ const getTime = require('./init-time');
  * Responsible for creating and maintaining proxy server and exposing information about passing traffic.
  */
 class TrafficInterceptor extends EventEmitter {
-    constructor(options) {
-        super();
+  constructor(options) {
+    super();
 
-        //TODO we never remove requests from here - see #8
-        this._connections = new Map();
+    //TODO we never remove requests from here - see #8
+    this._connections = new Map();
 
-        let proxy = new MITMProxy();
+    let proxy = new MITMProxy();
 
-        proxy.onRequest(handleIncomingRequest.bind(this));
-        proxy.onResponse(handleIncomingResponse.bind(this));
-        proxy.onError(handleProxyError.bind(this));
+    proxy.onRequest(handleIncomingRequest.bind(this));
+    proxy.onResponse(handleIncomingResponse.bind(this));
+    proxy.onError(handleProxyError.bind(this));
 
-        proxy.listen({
-            port: options.port,
-            sslCaDir: options.sslCaDir,
-            httpsPort: 8888
-        });
-    }
+    proxy.listen({
+      port: options.port,
+      sslCaDir: options.sslCaDir,
+      httpsPort: 8888
+    });
+  }
 
-    getConnection(id) {
-        return this._connections.get(id);
-    }
+  getConnection(id) {
+    return this._connections.get(id);
+  }
 }
 
 function handleIncomingRequest(ctx, callback) {
-    let connection = new CapturedConnection();
+  let connection = new CapturedConnection();
 
-    this._connections.set(connection.getId(), connection);
-    ctx.log = {
-        id: connection.getId()
-    };
+  this._connections.set(connection.getId(), connection);
+  ctx.log = {
+    id: connection.getId()
+  };
 
-    let trafficInterceptor = this;
-    let chunks = [];
+  let trafficInterceptor = this;
+  let chunks = [];
 
-    ctx.onRequestData(function(ctx, chunk, callback) {
-        chunks.push(chunk);
+  ctx.onRequestData(function(ctx, chunk, callback) {
+    chunks.push(chunk);
 
-        return callback(null, chunk);
-    });
+    return callback(null, chunk);
+  });
 
-    ctx.onRequestEnd(function(ctx, callback) {
-        connection.setRequest(ctx.clientToProxyRequest, ctx.isSSL, (Buffer.concat(chunks)).toString());
-        trafficInterceptor.emit('request', connection);
-
-        return callback();
-    });
+  ctx.onRequestEnd(function(ctx, callback) {
+    connection.setRequest(ctx.clientToProxyRequest, ctx.isSSL, (Buffer.concat(chunks)).toString());
+    trafficInterceptor.emit('request', connection);
 
     return callback();
+  });
+
+  return callback();
 }
 
 function handleIncomingResponse(ctx, callback) {
-    let request = ctx.clientToProxyRequest;
-    let response = ctx.serverToProxyResponse;
+  let request = ctx.clientToProxyRequest;
+  let response = ctx.serverToProxyResponse;
 
-    this.emit('log', 'Response arrived: ' + request.method + ' ' + request.url + ' ' + response.statusCode);
+  this.emit('log', 'Response arrived: ' + request.method + ' ' + request.url + ' ' + response.statusCode);
 
-    let connectionId = ctx.log && ctx.log.id;
-    let connection = null;
+  let connectionId = ctx.log && ctx.log.id;
+  let connection = null;
 
-    if (connectionId) {
-        connection = this.getConnection(connectionId);
-    }
+  if (connectionId) {
+    connection = this.getConnection(connectionId);
+  }
 
-    if (!connection) {
-        this.emit('error', 'Connection not found.');
-        return;
-    }
+  if (!connection) {
+    this.emit('error', 'Connection not found.');
+    return;
+  }
 
-    connection.setResponse(response);
-    connection.registerResponseReceived();
-    this.emit('response-received', connection);
+  connection.setResponse(response);
+  connection.registerResponseReceived();
+  this.emit('response-received', connection);
 
-    let trafficInterceptor = this;
+  let trafficInterceptor = this;
 
-    ctx.onResponseData(function(ctx, chunk, callback) {
-        connection.registerDataReceived(chunk);
+  ctx.onResponseData(function(ctx, chunk, callback) {
+    connection.registerDataReceived(chunk);
 
-        trafficInterceptor.emit('response-data', connection, {
-            time: getTime(),
-            encodedLength: chunk.length
-        });
-
-        return callback(null, chunk);
+    trafficInterceptor.emit('response-data', connection, {
+      time: getTime(),
+      encodedLength: chunk.length
     });
-    ctx.onResponseEnd(function(ctx, callback) {
-        connection.registerResponseFinished();
 
-        //after whole body was received and unpacked we can push its size to the front-end
-        trafficInterceptor.emit('response-data', connection, {
-            time: connection.getTiming().responseFinished,
-            length: connection.getSize(),
-            encodedLength: 0
-        });
+    return callback(null, chunk);
+  });
+  ctx.onResponseEnd(function(ctx, callback) {
+    connection.registerResponseFinished();
 
-        trafficInterceptor.emit('response-finished', connection);
-
-        return callback();
+    //after whole body was received and unpacked we can push its size to the front-end
+    trafficInterceptor.emit('response-data', connection, {
+      time: connection.getTiming().responseFinished,
+      length: connection.getSize(),
+      encodedLength: 0
     });
+
+    trafficInterceptor.emit('response-finished', connection);
 
     return callback();
+  });
+
+  return callback();
 }
 
 function handleProxyError(ctx, error) {
-    this.emit('error', 'Proxy error: ' + error);
+  this.emit('error', 'Proxy error: ' + error);
 }
 
 module.exports = TrafficInterceptor;
