@@ -23,7 +23,8 @@ class TrafficInterceptor extends EventEmitter {
 
         proxy.listen({
             port: options.port,
-            sslCaDir: options.sslCaDir
+            sslCaDir: options.sslCaDir,
+            httpsPort: 8888
         });
     }
 

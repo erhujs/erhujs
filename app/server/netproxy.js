@@ -37,7 +37,6 @@ module.exports = function (UIProcess, options) {
     // this part is responsible for capturing traffic
     trafficInterceptor
         .on('request', (connection) => {
-        	console.log(connection)
             frontEndConnection.send('Network.requestWillBeSent', RDPMessageFormatter.requestWillBeSent(connection));
         })
         .on('response-received', (connection) => {
