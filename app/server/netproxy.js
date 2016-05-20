@@ -1,7 +1,6 @@
 'use strict'
 
-const path = require('path');
-const argv = require('minimist')(process.argv.slice(2));
+const chalk = require('chalk')
 const FrontEndConnection = require('./lib/front-end-connection');
 const TrafficInterceptor = require('./lib/traffic-interceptor');
 const RDPMessageFormatter = require('./lib/rdp-message-formatter');
@@ -38,6 +37,7 @@ module.exports = function (UIProcess, options) {
     // this part is responsible for capturing traffic
     trafficInterceptor
         .on('request', (connection) => {
+        	console.log(connection)
             frontEndConnection.send('Network.requestWillBeSent', RDPMessageFormatter.requestWillBeSent(connection));
         })
         .on('response-received', (connection) => {
