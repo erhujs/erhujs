@@ -7,8 +7,11 @@ const url = require('url')
 const fs = require('fs')
 const shortid = require('shortid')
 const httpolyglot = require('httpolyglot')
-const MITMProxy = require('http-mitm-proxy');
+var MITMProxy = require('http-mitm-proxy');
 const debug = require('debug')('Proxy')
+const MITMProxyPatch = require('./lib/mitm-proxy-patch')
+// patch https port error
+MITMProxyPatch(MITMProxy.Proxy)
 
 function safeCall(fn) {
   if (typeof fn != 'function') return
@@ -20,9 +23,8 @@ function safeCall(fn) {
 function createProxy(opts, callbacks) {
   let proxy = new MITMProxy()
 
-  proxy.onError((ctx, err, cb) => {
+  proxy.onError((ctx, err) => {
     debug('Error', err)
-    return cb()
   })
   proxy.onRequest(function (ctx, calback) {
     const id = shortid.generate()
@@ -112,11 +114,11 @@ function createProxy(opts, callbacks) {
   })
 
   proxy.listen({
-    slient: true,
     port: opts.port,
-    sslCaDir: opts.sslCaDir,
-    forceSNI: true,
-    httpsPort: 8889
+    // slient: true,
+    // sslCaDir: opts.sslCaDir,
+    // forceSNI: true,
+    // httpsPort: 8888
   })
 
 }
