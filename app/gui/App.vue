@@ -40,11 +40,11 @@ export default {
   ready () {
 
     ipcRenderer.on('request', (event, request) => {
-      console.log(JSON.stringify(request))
+      console.log('Request', request)
       this.addNet(request)
     })
-    ipcRenderer.on('response', (event, response) => {
-      // console.log(event, response)
+    ipcRenderer.on('response-end', (event, request, response) => {
+      console.log('Response', response)
       this.resContent = response.data.toString()
     })
     mock(this)
