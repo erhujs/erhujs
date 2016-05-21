@@ -52,11 +52,11 @@ export default {
 }
 
 function mock(vm){
-  vm.addNet(JSON.parse('{"body":{"type":"Buffer","data":[]},"headers":{"accept":"*/*","host":"lib.sinaapp.com","proxy-connection":"Keep-Alive","user-agent":"curl/7.43.0"},"host":"lib.sinaapp.com","id":"SJg51aE2f","method":"GET","path":"http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js","port":80}'))
+  vm.addNet(JSON.parse('{"body":{"type":"Buffer","data":[]},"headers":{"accept":"*/*","host":"lib.sinaapp.com","proxy-connection":"Keep-Alive","user-agent":"curl/7.43.0"},"host":"lib.sinaapp.com","id":"SJg51aE2f","method":"GET","url":"http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js","port":80}'))
 
-  vm.addNet(JSON.parse('{"body":{"type":"Buffer","data":[]},"headers":{"accept":"*/*","host":"lib.sinaapp.com","proxy-connection":"Keep-Alive","user-agent":"curl/7.43.0"},"host":"lib.sinaapp.com","id":"SJg51aE2f","method":"GET","path":"http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js","port":80}'))
+  vm.addNet(JSON.parse('{"body":{"type":"Buffer","data":[]},"headers":{"accept":"*/*","host":"lib.sinaapp.com","proxy-connection":"Keep-Alive","user-agent":"curl/7.43.0"},"host":"lib.sinaapp.com","id":"SJg51aE2f","method":"GET","url":"http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js","port":80}'))
 
-  vm.addNet(JSON.parse('{"body":{"type":"Buffer","data":[]},"headers":{"accept":"*/*","host":"lib.sinaapp.com","proxy-connection":"Keep-Alive","user-agent":"curl/7.43.0"},"host":"lib.sinaapp.com","id":"SJg51aE2f","method":"GET","path":"http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js","port":80}'))
+  vm.addNet(JSON.parse('{"body":{"type":"Buffer","data":[]},"headers":{"accept":"*/*","host":"lib.sinaapp.com","proxy-connection":"Keep-Alive","user-agent":"curl/7.43.0"},"host":"lib.sinaapp.com","id":"SJg51aE2f","method":"GET","url":"http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js","port":80}'))
 }
 
 </script>

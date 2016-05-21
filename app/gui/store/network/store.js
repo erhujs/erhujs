@@ -14,7 +14,6 @@ const state = {
 
 const mutations = {
   ADD_NETWORK (state, req) {
-    console.log(req)
     state.lists.push(parser(req))
   },
 
@@ -43,11 +42,11 @@ const mutations = {
 
 function parser(req){
   return {
-    'result': 200,
+    'result': req.statusCode || 200,
     'protocol': req.method,
     'host': req.host,
-    'url': req.path,
-    'body': '',
+    'url': req.url,
+    'body': req.body.length,
     'caching': '',
     'contentType': req.headers.accept,
     'process': '',

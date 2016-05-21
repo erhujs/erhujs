@@ -27,14 +27,14 @@
               <td>{{r.host}}</td>
               <td>{{r.url}}</td>
               <td>{{r.body}}</td>
-              <td>{{r.caching}}</td>
+              <!-- <td>{{r.caching}}</td> -->
               <td>{{r.contentType}}</td>
-              <td>{{r.process}}</td>
-              <td>{{r.comments}}</td>
-              <td>{{r.custom}}</td>
+              <!-- <td>{{r.process}}</td> -->
+              <!-- <td>{{r.comments}}</td> -->
+              <!-- <td>{{r.custom}}</td> -->
             </tr>
           </tbody>
-        </table>  
+        </table>
       </div>
     </div>
   </div>

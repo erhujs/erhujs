@@ -11,11 +11,6 @@ const proxy = require('./server/proxy')
 const netproxy = require('./server/netproxy')
 const argv = require('minimist')(process.argv.slice(2));
 
-const options = {
-	port: argv['proxy-port'] || 8888,
-	sslCaDir: argv['ssl-ca-dir'] || path.resolve(app.getPath('userData'), 'ssl')
-}
-
 let mainWindow
 
 function createWindow() {
@@ -39,8 +34,14 @@ function createWindow() {
 		titleBarStyle: 'hidden-inset'
 		// frame: false
 	})
+
+  var sslCaDir = path.resolve(app.getPath('userData'), 'ssl')
+  console.log('sslCaDir', sslCaDir)
 	// setup proxy server
-  proxy(options, {
+  proxy({
+    port: 8888,
+    sslCaDir
+  }, {
     onRequest: (req) => {
       mainWindow.webContents.send('request', req)
     },
@@ -77,7 +78,7 @@ function createWindow() {
 
 	mainWindow.loadURL(mainURL)
 
-	mainWindow.webContents.openDevTools()
+	// mainWindow.webContents.openDevTools()
 
 	mainWindow.on('closed', function () {
 
@@ -85,7 +86,7 @@ function createWindow() {
 		mainWindow = null
 	})
 
-	const menuTemplate = require('./server/menu')(app, options)
+	const menuTemplate = require('./server/menu')(app, {})
 
   console.log(menuTemplate)
 

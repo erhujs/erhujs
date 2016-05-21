@@ -2,15 +2,16 @@
 
 const http = require('http')
 const https = require('https')
-const express = require('express')
 const url = require('url')
 const fs = require('fs')
+const path = require('path')
 const shortid = require('shortid')
 const httpolyglot = require('httpolyglot')
 var MITMProxy = require('http-mitm-proxy');
 const debug = require('debug')('Proxy')
 const MITMProxyPatch = require('./lib/mitm-proxy-patch')
 // patch https port error
+// resolved since 0.5.0
 MITMProxyPatch(MITMProxy.Proxy)
 
 function safeCall(fn) {
@@ -42,9 +43,11 @@ function createProxy(opts, callbacks) {
       port,
       method,
       protocol: ctx.isSSL ? 'https' : 'http',
-      path: url.format(urlObj),
+      url: req.url,
+      path: urlObj.path,
       headers: req.headers,
-      body: new Buffer('')
+      body: new Buffer(''),
+      remoteAddress: ''
     }
     /**
      * @event request
@@ -74,17 +77,24 @@ function createProxy(opts, callbacks) {
      */
     var response = {
       id,
-      data: new Buffer('')
+      data: new Buffer(''),
+      statusCode: 0,
+      statusMessage: '',
+      headers: {}
     }
     ctx.onResponse((ctx, cb) => {
 
       let proxyReq = ctx.proxyToServerRequest
       let proxyRes = ctx.serverToProxyResponse
 
-      request.server = proxyReq.connection.remoteAddress
-      response.headers = proxyRes.headers
+      request.remoteAddress = proxyReq.connection.remoteAddress
+      Object.assign(response, {
+        statusCode: proxyRes.statusCode,
+        statusMessage: proxyRes.statusMessage,
+        headers: proxyRes.headers
+      })
 
-      debug('#'+id, 'onResponse', request.server)
+      debug('#'+id, 'onResponse', request.remoteAddress)
       safeCall(callbacks.onResponse, request, response)
       return cb()
     })
@@ -114,11 +124,8 @@ function createProxy(opts, callbacks) {
   })
 
   proxy.listen({
-    port: opts.port,
-    // slient: true,
-    // sslCaDir: opts.sslCaDir,
-    // forceSNI: true,
-    // httpsPort: 8888
+    port: opts.port || 8888,
+    sslCaDir: opts.sslCaDir
   })
 
 }

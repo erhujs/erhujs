@@ -50,15 +50,16 @@ npm run build
 
 ```
 request {
-	id,			// 为该请求分配的唯一ID
+	id,			  // 为该请求分配的唯一ID
 	protocol	// http/https/ws/tcp
-	host,		// hostname, 如：localhost
-	port,		// 80 的时候为空
+	host,		  // hostname, 如：localhost
+	port,		  // 80 的时候为空
 	method,		// GET/POST/PUT
-	path,		// 完整的URL
+	path,		  // 完整的URL
+  url,      // 完整的URL
 	headers,	// 请求头
-	server,		// remote server IP，只能在 connect 事件触发后拿获得
-	body		// <Buffer> 请求的体内容，只能在 proxyReceived 事件触发后拿到完整的值
+	server,		// remote server IP，只能在 connected 事件触发后拿获得
+	body		  // <Buffer> 请求的体内容，只能在 response-end 事件触发后拿到完整的值
 }
 ```
 
@@ -66,9 +67,11 @@ request {
 
 ```
 response {
-	id,			// 与请求对象的 ID 一致
-	headers,	// 响应头
-	data		// <Buffer> 响应内容，只能在 reponseEnd 事件触发后拿到完整的值
+	id,			    // 与请求对象的 ID 一致
+  statusCode, // 状态码
+  statusMessage,
+	headers,	  // 响应头
+	data		    // <Buffer> 响应内容，只能在 reponse-end 事件触发后拿到完整的值
 }
 ```
 
