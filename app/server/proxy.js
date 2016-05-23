@@ -7,12 +7,12 @@ const fs = require('fs')
 const path = require('path')
 const shortid = require('shortid')
 const httpolyglot = require('httpolyglot')
-var MITMProxy = require('http-mitm-proxy');
+const MITMProxy = require('http-mitm-proxy');
 const debug = require('debug')('Proxy')
 const MITMProxyPatch = require('./lib/mitm-proxy-patch')
 // patch https port error
 // resolved since 0.5.0
-MITMProxyPatch(MITMProxy.Proxy)
+// MITMProxyPatch(MITMProxy.Proxy)
 
 function safeCall(fn) {
   if (typeof fn != 'function') return
@@ -87,7 +87,17 @@ function createProxy(opts, callbacks) {
       let proxyReq = ctx.proxyToServerRequest
       let proxyRes = ctx.serverToProxyResponse
 
-      request.remoteAddress = proxyReq.connection.remoteAddress
+      /**
+       * Erhu extend method
+       * @event connected
+       */
+      proxyReq.on('socket', (socket) => {
+        socket.on('connected', () => {
+          request.server = socket.remoteAddress
+          safeCall(callbacks.connected, request)
+        })
+      })
+
       Object.assign(response, {
         statusCode: proxyRes.statusCode,
         statusMessage: proxyRes.statusMessage,
@@ -108,19 +118,11 @@ function createProxy(opts, callbacks) {
       safeCall(callbacks.onResponseEnd, request, response)
       return cb()
     })
-    /**
-     * Erhu extend method
-     * @event connected
-     */
-    req.on('socket', (socket) => {
-      socket.on('connected', () => {
-        request.server = socket.remoteAddress
-        safeCall(callbacks.connected, request)
-      })
+    proxy.on('connect', (socket, cltSocket, head) => {
+      console.log('#### connect', head)
     })
 
     return calback()
-
   })
 
   proxy.listen({
@@ -129,4 +131,18 @@ function createProxy(opts, callbacks) {
   })
 
 }
+
+/*
+* Detect TLS from first bytes of data
+* Inspired from https://gist.github.com/tg-x/835636
+* used heuristic:
+* - an incoming connection using SSLv3/TLSv1 records should start with 0x16
+* - an incoming connection using SSLv2 records should start with the record size
+*   and as the first record should not be very big we can expect 0x80 or 0x00 (the MSB is a flag)
+* - everything else is considered to be unencrypted
+*/
+function isTLS(head) {
+  return head[0] == 0x16 || head[0] == 0x80 || head[0] == 0x00
+}
+
 module.exports = createProxy
