@@ -3,13 +3,18 @@
  *
  * @param
  */
-
+import config from '../config.js'
 import Vuex from 'vuex'
 import Vue from 'vue'
 Vue.use(Vuex)
 
+
+let defaultColumns = getColumns()
+
 const state = {
-  lists: []
+  columnsVisibility: config.defaultColumnsVisibility,
+  columns: defaultColumns,
+  lists: [],
 }
 
 const mutations = {
@@ -40,19 +45,50 @@ const mutations = {
   }
 }
 
-function parser(req){
+function parser (req) {
   return {
-    'result': req.statusCode || 200,
-    'protocol': req.method,
-    'host': req.host,
-    'url': req.url,
-    'body': req.body.length,
-    'caching': '',
-    'contentType': req.headers.accept,
-    'process': '',
-    'comments': '',
-    'custom': '',
+    "name": req.url,
+    "method": req.method,
+    "status": req.statusCode || 200,
+    "protocol": "Protocol",
+    "scheme": "Scheme",
+    "domain": req.host,
+    "remoteAddress": "Remote Address",
+    "type": "Type",
+    "initiator": "Initiator",
+    "cookies": "Cookies",
+    "setCookies": "Set-Cookies",
+    "size": req.body.length,
+    "time": "Time",
+    "connectionId": "Connection Id",
+    "priority": "Priority",
+    "timeline": "Timeline",
+
+    // Response header columns
+    "Cache-Control": "Cache-Control",
+    "Connection": "Connection",
+    "Content-Encoding": "Content-Encoding",
+    "Content-Length": "Content-Length",
+    "ETag": "ETag",
+    "Keep-Alive": "Keep-Alive",
+    "Last-Modified": "Last-Modified",
+    "Server": "Server",
+    "Vary": "Vary"
   }
+
+  return columns
+}
+
+function getColumns(){
+  let columns = []
+  
+  config.defaultColumns.forEach( (item) => {
+    if(config.defaultColumnsVisibility[item.id]){
+      columns.push(item)   
+    }
+  })
+
+  return columns
 }
 
 export default new Vuex.Store({
