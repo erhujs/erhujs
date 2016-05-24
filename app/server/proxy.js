@@ -10,10 +10,8 @@ const shortid = require('shortid')
 const httpolyglot = require('httpolyglot')
 const MITMProxy = require('http-mitm-proxy');
 const debug = require('debug')('Proxy')
-// const MITMProxyPatch = require('./lib/mitm-proxy-patch')
-// patch https port error
-// resolved since 0.5.0
-// MITMProxyPatch(MITMProxy.Proxy)
+const MITMProxyPatch = require('./lib/mitm-proxy-patch')
+MITMProxyPatch(MITMProxy.Proxy)
 
 /**
  * Call function safely if not typeof function
