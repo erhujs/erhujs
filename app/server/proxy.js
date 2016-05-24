@@ -13,27 +13,16 @@ const debug = require('debug')('Proxy')
 const MITMProxyPatch = require('./lib/mitm-proxy-patch')
 MITMProxyPatch(MITMProxy.Proxy)
 
-/**
- * Call function safely if not typeof function
- */
-function emitEvent(fn) {
-  if (typeof fn != 'function') return
-
-  var args = [].slice.call(arguments, 1)
-  return fn.apply(null, args)
-}
-function IDLogger(id) {
-  return debug.bind(null, `#${id}`)
-}
 function createProxy(opts, callbacks) {
   let proxy = new MITMProxy()
 
   proxy.onError((ctx, err) => {
     debug('Error', err)
   })
+
   proxy.onConnect(function (req, socket, head, callback) {
     let id = shortid.generate()
-    let debug = IDLogger(id)
+    let debug = bindDebug(`#${id}`)
     let urlObj = url.parse(`https://${req.url}`)
     let host = urlObj.hostname
     let port = urlObj.port || 443
@@ -68,7 +57,8 @@ function createProxy(opts, callbacks) {
      */
     emitEvent(callbacks.onRequestEnd, request)
     let conn = net.connect(port, host, function(){
-      debug('Tunnel connected')
+      debug('Tunnel connected', conn.remoteAddress)
+      request.remoteAddress = conn.remoteAddress
       /**
        * @event connected
        */
@@ -99,18 +89,19 @@ function createProxy(opts, callbacks) {
     })
     conn.on('error',function(e){
       debug('Tunnel error', e)
+      response.statusMessage = e.message || error
     })
   })
   proxy.onRequest(function (ctx, calback) {
     let id = shortid.generate()
-    let debug = IDLogger(id)
+    let debug = bindDebug(`#${id}`)
     let req = ctx.clientToProxyRequest
     let urlObj = url.parse(req.url)
     let host = req.headers.host || urlObj.host
     let port = url.parse(host).port || 80
     let method = req.method
 
-    debug('HTTP onRequest', req.url)
+    debug('HTTP request', host, urlObj.path)
     let request = {
       id,
       host,
@@ -138,39 +129,54 @@ function createProxy(opts, callbacks) {
       return cb(null, chunk)
     })
     /**
-     * @event onRequestEnd
+     * @event request-end
      */
     ctx.onRequestEnd((ctx, cb) => {
       debug('HTTP request-end')
       emitEvent(callbacks.onRequestEnd, request)
       return cb()
     })
-    /**
-     * @event onResponse
-     */
-    var response = {
+
+    let response = {
       id,
       data: new Buffer(''),
       statusCode: 0,
       statusMessage: '',
       headers: {}
     }
-    ctx.onResponse((ctx, cb) => {
 
+    /**
+     * Get proxyToServerRequest instance immediately by hack
+     */
+    let proxyReq
+    Object.defineProperty(ctx, 'proxyToServerRequest', {
+      configurable: true,
+      enumerable: true,
+      set (v) {
+        if (!proxyReq && v) {
+          // call only
+          proxyReq = v
+          /**
+           * Erhu extend method
+           * @event connected
+           */
+          proxyReq.on('socket', (socket) => {
+            socket.on('connect', () => {
+              debug('HTTP connected', socket.remoteAddress)
+              request.server = socket.remoteAddress
+              emitEvent(callbacks.onConnected, request)
+            })
+          })
+          // remove descriptor
+          delete ctx.proxyToServerRequest
+          // reset value
+          ctx.proxyToServerRequest = v
+        }
+      }
+    })
+    ctx.onResponse((ctx, cb) => {
       let proxyReq = ctx.proxyToServerRequest
       let proxyRes = ctx.serverToProxyResponse
-
-      /**
-       * Erhu extend method
-       * @event connected
-       */
-      proxyReq.on('socket', (socket) => {
-        socket.on('connected', () => {
-          debug('HTTP connected')
-          request.server = socket.remoteAddress
-          emitEvent(callbacks.onConnected, request)
-        })
-      })
 
       Object.assign(response, {
         statusCode: proxyRes.statusCode,
@@ -194,7 +200,7 @@ function createProxy(opts, callbacks) {
       return cb(null, chunk)
     })
     ctx.onResponseEnd((ctx, cb) => {
-      debug('HTTP onResponseEnd')
+      debug('HTTP response-end')
       /**
        * @event responseEnd
        */
@@ -204,13 +210,14 @@ function createProxy(opts, callbacks) {
     return calback()
   })
 
+  let port = opts.port || 8888
   proxy.listen({
-    port: opts.port || 8888,
+    port: port,
     sslCaDir: opts.sslCaDir
   })
-
+  debug('sslCaDir', opts.sslCaDir)
+  debug('server listen on', port)
 }
-
 /*
 * Detect TLS from first bytes of data
 * Inspired from https://gist.github.com/tg-x/835636
@@ -223,5 +230,18 @@ function createProxy(opts, callbacks) {
 function isTLS(head) {
   return head[0] == 0x16 || head[0] == 0x80 || head[0] == 0x00
 }
+/**
+ * Check callback type and emit safely
+ */
+function emitEvent(fn) {
+  if (typeof fn != 'function') return
 
+  var args = [].slice.call(arguments, 1)
+  return fn.apply(null, args)
+}
+function bindDebug() {
+  var args = [].slice.call(arguments)
+  args.unshift(null)
+  return debug.bind.apply(debug, args)
+}
 module.exports = createProxy

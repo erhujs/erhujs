@@ -36,7 +36,6 @@ function createWindow() {
 	})
 
   var sslCaDir = path.resolve(app.getPath('userData'), 'ssl')
-  console.log('sslCaDir', sslCaDir)
 	// setup proxy server
   proxy({
     port: 8888,
