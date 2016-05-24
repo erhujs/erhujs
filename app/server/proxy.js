@@ -4,6 +4,7 @@ const http = require('http')
 const https = require('https')
 const url = require('url')
 const fs = require('fs')
+const net = require('net')
 const path = require('path')
 const shortid = require('shortid')
 const httpolyglot = require('httpolyglot')
@@ -27,6 +28,22 @@ function createProxy(opts, callbacks) {
   proxy.onError((ctx, err) => {
     debug('Error', err)
   })
+  proxy.onConnect(function (req, socket, head, callback) {
+    var host = req.url.split(":")[0]
+    var port = req.url.split(":")[1]
+
+    console.log('## HTTPS tunnel', host, port, req.headers)
+    var conn = net.connect(port, host, function(){
+      socket.write('HTTP/1.1 200 OK\r\n\r\n', 'UTF-8', function(){
+        conn.pipe(socket);
+        socket.pipe(conn);
+      })
+    })
+
+    conn.on("error",function(e){
+      console.log('## Error', e)
+    })
+  })
   proxy.onRequest(function (ctx, calback) {
     const id = shortid.generate()
     let req = ctx.clientToProxyRequest
@@ -35,6 +52,7 @@ function createProxy(opts, callbacks) {
     let port = url.parse(host).port || 80
     let method = req.method
 
+    console.log('#'+id, req.url, req.host, req.headers)
     debug('#'+id, 'onRequest', req.url)
 
     let request = {
@@ -118,10 +136,6 @@ function createProxy(opts, callbacks) {
       safeCall(callbacks.onResponseEnd, request, response)
       return cb()
     })
-    proxy.on('connect', (socket, cltSocket, head) => {
-      console.log('#### connect', head)
-    })
-
     return calback()
   })
 
