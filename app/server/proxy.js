@@ -10,18 +10,23 @@ const shortid = require('shortid')
 const httpolyglot = require('httpolyglot')
 const MITMProxy = require('http-mitm-proxy');
 const debug = require('debug')('Proxy')
-const MITMProxyPatch = require('./lib/mitm-proxy-patch')
+// const MITMProxyPatch = require('./lib/mitm-proxy-patch')
 // patch https port error
 // resolved since 0.5.0
 // MITMProxyPatch(MITMProxy.Proxy)
 
-function safeCall(fn) {
+/**
+ * Call function safely if not typeof function
+ */
+function emitEvent(fn) {
   if (typeof fn != 'function') return
 
   var args = [].slice.call(arguments, 1)
   return fn.apply(null, args)
 }
-
+function IDLogger(id) {
+  return debug.bind(null, `#${id}`)
+}
 function createProxy(opts, callbacks) {
   let proxy = new MITMProxy()
 
@@ -29,32 +34,85 @@ function createProxy(opts, callbacks) {
     debug('Error', err)
   })
   proxy.onConnect(function (req, socket, head, callback) {
-    var host = req.url.split(":")[0]
-    var port = req.url.split(":")[1]
-
-    console.log('## HTTPS tunnel', host, port, req.headers)
-    var conn = net.connect(port, host, function(){
+    let id = shortid.generate()
+    let debug = IDLogger(id)
+    let urlObj = url.parse(`https://${req.url}`)
+    let host = urlObj.hostname
+    let port = urlObj.port || 443
+    let method = 'TUNNEL'
+    let request = {
+      id,
+      host,
+      port,
+      method,
+      protocol: 'https',
+      url: `https://${req.url}`,
+      path: '',
+      headers: req.headers,
+      body: new Buffer(''),
+      remoteAddress: '',
+      cookies: {}
+    }
+    let response = {
+      id,
+      data: new Buffer(''),
+      statusCode: 200,
+      statusMessage: '',
+      headers: {}
+    }
+    debug('Tunnel to', req.url)
+    /**
+     * @event request
+     */
+    emitEvent(callbacks.onRequest, request)
+    /**
+     * @event request
+     */
+    emitEvent(callbacks.onRequestEnd, request)
+    let conn = net.connect(port, host, function(){
+      debug('Tunnel connected')
+      /**
+       * @event connected
+       */
+      emitEvent(callbacks.onConnected, request)
       socket.write('HTTP/1.1 200 OK\r\n\r\n', 'UTF-8', function(){
-        conn.pipe(socket);
-        socket.pipe(conn);
+        debug('Tunnel response')
+        /**
+         * @event response
+         */
+        emitEvent(callbacks.onResponse, request, response)
+        conn.pipe(socket)
+        socket.pipe(conn)
       })
     })
-
-    conn.on("error",function(e){
-      console.log('## Error', e)
+    conn.on('data', function (chunk) {
+      response.data = Buffer.concat([response.data, chunk], response.data.length + chunk.length)
+      /**
+       * @event responseData
+       */
+      emitEvent(callbacks.onResponseData, chunk)
+    })
+    conn.on('end', function () {
+      debug('Tunnel end')
+      /**
+       * @event responseEnd
+       */
+      emitEvent(callbacks.onResponseEnd, request, response)
+    })
+    conn.on('error',function(e){
+      debug('Tunnel error', e)
     })
   })
   proxy.onRequest(function (ctx, calback) {
-    const id = shortid.generate()
+    let id = shortid.generate()
+    let debug = IDLogger(id)
     let req = ctx.clientToProxyRequest
     let urlObj = url.parse(req.url)
     let host = req.headers.host || urlObj.host
     let port = url.parse(host).port || 80
     let method = req.method
 
-    console.log('#'+id, req.url, req.host, req.headers)
-    debug('#'+id, 'onRequest', req.url)
-
+    debug('HTTP onRequest', req.url)
     let request = {
       id,
       host,
@@ -65,29 +123,28 @@ function createProxy(opts, callbacks) {
       path: urlObj.path,
       headers: req.headers,
       body: new Buffer(''),
-      remoteAddress: ''
+      remoteAddress: '',
+      cookies: {}
     }
     /**
      * @event request
      */
-    safeCall(callbacks.onRequest, request)
+    emitEvent(callbacks.onRequest, request)
     /**
      * @event onRequestData
      */
     ctx.onRequestData((ctx, chunk, cb) => {
-      debug('#'+id, 'onRequestData', chunk.length)
-
+      debug('HTTP request-data')
       request.body = Buffer.concat([request.body, chunk], request.body.length + chunk.length)
-      safeCall(callbacks.onRequestData, request)
+      emitEvent(callbacks.onRequestData, request)
       return cb(null, chunk)
     })
     /**
      * @event onRequestEnd
      */
     ctx.onRequestEnd((ctx, cb) => {
-      debug('#'+id, 'onRequestEnd')
-
-      safeCall(callbacks.onRequestEnd, request)
+      debug('HTTP request-end')
+      emitEvent(callbacks.onRequestEnd, request)
       return cb()
     })
     /**
@@ -111,8 +168,9 @@ function createProxy(opts, callbacks) {
        */
       proxyReq.on('socket', (socket) => {
         socket.on('connected', () => {
+          debug('HTTP connected')
           request.server = socket.remoteAddress
-          safeCall(callbacks.connected, request)
+          emitEvent(callbacks.onConnected, request)
         })
       })
 
@@ -122,18 +180,27 @@ function createProxy(opts, callbacks) {
         headers: proxyRes.headers
       })
 
-      debug('#'+id, 'onResponse', request.remoteAddress)
-      safeCall(callbacks.onResponse, request, response)
+      debug('HTTP response', request.remoteAddress)
+      /**
+       * @event response
+       */
+      emitEvent(callbacks.onResponse, request, response)
       return cb()
     })
     ctx.onResponseData((ctx, chunk, cb) => {
       response.data = Buffer.concat([response.data, chunk], response.data.length + chunk.length)
-      safeCall(callbacks.onResponseData, request, response)
+      /**
+       * @event responseData
+       */
+      emitEvent(callbacks.onResponseData, request, response)
       return cb(null, chunk)
     })
     ctx.onResponseEnd((ctx, cb) => {
-      debug('#'+id, 'onResponseEnd')
-      safeCall(callbacks.onResponseEnd, request, response)
+      debug('HTTP onResponseEnd')
+      /**
+       * @event responseEnd
+       */
+      emitEvent(callbacks.onResponseEnd, request, response)
       return cb()
     })
     return calback()
