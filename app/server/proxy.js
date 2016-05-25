@@ -220,6 +220,8 @@ function createProxy(opts, callbacks) {
       emitEvent(callbacks.onResponseEnd, request, response)
       return cb()
     })
+
+    // request pass through
     return calback()
   })
 
