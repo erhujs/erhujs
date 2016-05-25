@@ -50,16 +50,17 @@ npm run build
 
 ```
 request {
-	id,			  // 为该请求分配的唯一ID
-	protocol	// http/https/ws/tcp
-	host,		  // hostname, 如：localhost
-	port,		  // 80 的时候为空
-	method,		// GET/POST/PUT
-	path,		  // 完整的URL
+  id,       // 为该请求分配的唯一ID
+  protocol  // http/https/ws/tcp
+  host,     // hostname, 如：localhost
+  port,     // 80 的时候为空
+  method,   // GET/POST/PUT
+  path,     // pathname?search
   url,      // 完整的URL
-	headers,	// 请求头
-	server,		// remote server IP，只能在 connected 事件触发后拿获得
-	body		  // <Buffer> 请求的体内容，只能在 response-end 事件触发后拿到完整的值
+  headers,  // 请求头
+  remoteAddress,   // remote server IP，只能在 connected 事件触发后拿获得
+  body,      // <Buffer> 请求的体内容，只能在 request-end 事件触发后拿到完整的值
+  cookies    // 解析cookie后得到的cookie对象
 }
 ```
 
@@ -67,11 +68,11 @@ request {
 
 ```
 response {
-	id,			    // 与请求对象的 ID 一致
+  id,         // 与请求对象的 ID 一致
   statusCode, // 状态码
   statusMessage,
-	headers,	  // 响应头
-	data		    // <Buffer> 响应内容，只能在 reponse-end 事件触发后拿到完整的值
+  headers,    // 响应头
+  data        // <Buffer> 响应内容，只能在 reponse-end 事件触发后拿到完整的值
 }
 ```
 
@@ -85,27 +86,27 @@ response {
 
 * **request-data**(req)
 
-	接收到请求body时触发，用于获取如 POST 的请求体。`多次触发`
+  接收到请求body时触发，用于获取如 POST 的请求体。`多次触发`
 
 * **request-end**(req)
 
-	已完整获取请求 body 时触发。`触发一次`
+  已完整获取请求 body 时触发。`触发一次`
 
 * **connected**(req)
 
-	代理请求成功建立链接时触发。`触发一次`
+  代理请求成功建立链接时触发。`触发一次`
 
 * **response**(req, res)
 
-	接收到响应的第一个包时触发。`触发一次`
+  接收到响应的第一个包时触发。`触发一次`
 
 * **reponse-data**(req, res)
 
-	接收到响应body时触发。`多次触发`
+  接收到响应body时触发。`多次触发`
 
 * **response-end**(req, res)
 
-	完成响应 body 接收后触发。`触发一次`
+  完成响应 body 接收后触发。`触发一次`
 
 
 ### Documents

@@ -152,9 +152,9 @@ function createProxy(opts, callbacks) {
 
     let response = {
       id,
-      data: new Buffer(''),
       statusCode: 0,
       statusMessage: '',
+      data: new Buffer(''),
       headers: {}
     }
 
