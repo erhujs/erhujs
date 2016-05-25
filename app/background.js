@@ -8,7 +8,6 @@ const app = electron.app
 const Menu = electron.Menu
 const BrowserWindow = electron.BrowserWindow
 const proxy = require('./server/proxy')
-const netproxy = require('./server/netproxy')
 const argv = require('minimist')(process.argv.slice(2));
 
 let mainWindow
