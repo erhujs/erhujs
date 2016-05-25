@@ -100,8 +100,21 @@ function createProxy(opts, callbacks) {
     let host = req.headers.host || urlObj.host
     let port = url.parse(host).port || 80
     let method = req.method
+    let internalProxy = process.env['http_proxy'] || process.env['HTTP_PROXY']
 
-    debug('HTTP request', host, urlObj.path)
+    if (internalProxy) {
+      var proxyObj = url.parse(internalProxy)
+      if (!proxyObj.hostname) return
+      var reqOpts = ctx.proxyToServerRequestOptions
+      Object.assign(reqOpts, {
+        host: proxyObj.hostname,
+        port: proxyObj.port || 80,
+        path: `http://${host}${port == 80 ? '':':'+port}${urlObj.path || '/'}`
+      })
+      debug('HTTP proxy', internalProxy)
+    }
+
+    debug('HTTP request', req.url)
     let request = {
       id,
       host,
@@ -210,6 +223,9 @@ function createProxy(opts, callbacks) {
     return calback()
   })
 
+  // handle webscoket event for external
+  handleWebsocket(opts, proxy)
+
   let port = opts.port || 8888
   proxy.listen({
     port: port,
@@ -217,6 +233,43 @@ function createProxy(opts, callbacks) {
   })
   debug('sslCaDir', opts.sslCaDir)
   debug('server listen on', port)
+
+  return proxy
+}
+/**
+ * handle webscoket event for external
+ * @param  {Object} options Proxy options
+ * @param  {Object} proxy   Proxy instance
+ * @return {Object}         proxy instance
+ */
+function handleWebsocket(options, proxy) {
+  proxy.onWebSocketConnection((ctx, cb) => {
+    let id = shortid.generate()
+    let debug = bindDebug(`#${id}`)
+    debug('WS connect')
+
+    ctx
+      .onWebSocketSend((ctx, message, flags, cb) => {
+        debug('WS send')
+
+      })
+      .onWebSocketMessage((ctx, message, flags, cb) => {
+        debug('WS message')
+
+      })
+      .onWebSocketFrame((ctx, type, fromServer, data, flags, cb) => {
+
+      })
+      .onWebSocketClose((ctx, code, message, cb) => {
+        debug('WS close', err)
+
+      })
+      .onWebSocketError((ctx, err) => {
+        debug('WS error', err)
+
+      })
+  })
+  return proxy
 }
 /*
 * Detect TLS from first bytes of data
