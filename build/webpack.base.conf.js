@@ -65,6 +65,10 @@ module.exports = {
         loader: "style-loader!css-loader"
       },
       {
+        test: /\.styl$/,
+        loader: "style-loader!css-loader!stylus-loader"
+      },
+      {
         test: /\.html$/,
         loader: 'vue-html'
       },
@@ -90,7 +94,8 @@ module.exports = {
       'clipboard',
       'crash-reporter',
       'screen',
-      'shell'
+      'shell',
+      'express'
     ])
   ],
   vue: {
