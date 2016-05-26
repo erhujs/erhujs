@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /*
 Functions below are responsible for creating valid Remote Debugging Protocol messages based on the
@@ -6,7 +6,7 @@ CapturedConnection object.
  */
 
 function requestWillBeSent(connection) {
-  let request = connection.getRequest();
+  let request = connection.getRequest()
 
   return {
     requestId: `${connection.getId()}`,
@@ -27,11 +27,11 @@ function requestWillBeSent(connection) {
       type: 'other'
     },
     type: connection.getResourceType()
-  };
+  }
 }
 
 function responseReceived(connection) {
-  let response = connection.getResponse();
+  let response = connection.getResponse()
 
   return {
     requestId: `${connection.getId()}`,
@@ -71,7 +71,7 @@ function responseReceived(connection) {
       remoteIPAddress: response.remoteAddress,
       remotePort: response.remotePort
     }
-  };
+  }
 }
 
 function dataReceived(connection, chunkInfo) {
@@ -80,7 +80,7 @@ function dataReceived(connection, chunkInfo) {
     timestamp: chunkInfo.time,
     dataLength: chunkInfo.length,
     encodedDataLength: chunkInfo.encodedLength
-  };
+  }
 }
 
 function loadingFinished(connection) {
@@ -88,22 +88,22 @@ function loadingFinished(connection) {
     requestId: `${connection.getId()}`,
     timestamp: connection.getTiming().responseFinished,
     encodedDataLength: connection.getEncodedSize()
-  };
+  }
 }
 
 function getResponseBody(connection) {
-  let body = '';
-  let base64Encoded = false;
+  let body = ''
+  let base64Encoded = false
 
   if (connection && connection.getResponseBody()) {
-    body = connection.getResponseBody();
-    base64Encoded = connection.isBinary();
+    body = connection.getResponseBody()
+    base64Encoded = connection.isBinary()
   }
 
   return {
     body,
     base64Encoded
-  };
+  }
 }
 
 function getResourceTree() {
@@ -117,7 +117,7 @@ function getResourceTree() {
       childFrames: [],
       resources: []
     }
-  };
+  }
 }
 
 module.exports = {
@@ -127,4 +127,4 @@ module.exports = {
   loadingFinished,
   getResponseBody,
   getResourceTree
-};
+}

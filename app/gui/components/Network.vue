@@ -3,7 +3,7 @@
     <div class="filter-bar">
       filter
     </div>
-    <div class="data-grid network-log-grid">
+    <div class="data-grid network-log-grid" v-el:grid>
       <div class="header-container">
         <table class="header">
           <colgroup></colgroup>
@@ -15,6 +15,7 @@
                   <div v-if="it.sub" class="header-subtitle">{{it.sub}}</div>  
                 </div>
               </th>
+              <th class="corner"></th>
             </tr>
           </tbody>
         </table>
@@ -22,9 +23,15 @@
       <div class="data-container">
         <table class="data">
           <tbody>
-            <tr v-for="r in lists">
-              <td>{{$index}}</td>
-              <td>{{r.result}}</td>
+            <tr v-for="connection in connections" track-by="$index">
+              <td>{{$index}}</td> 
+              <td class="{{ct.id}}-column" v-for="ct in connection">
+                <div class="">
+                  {{ct.title}}
+                  <div v-if="ct.sub" class="network-cell-subtitle">{{ct.sub}}</div>  
+                </div>
+              </td>
+              <td class="corner"></td>
             </tr>
           </tbody>
         </table>
@@ -45,15 +52,22 @@ export default {
   vuex: {
     getters:{
       columns: state => state.columns,
-      lists: state => state.lists,
+      connections: state => state.connections,
       columnsVisibility: state => state.columnsVisibility,
     }
   },
   ready () {
+    console.log(this.$els.grid)
+    console.log(this.headerTableColumns, this.tableWith)
     console.log(this.columnsVisibility, this.columns)
   },
   computed:{
-
+    headerTableColumns () {
+      return this.columns.length
+    },
+    tableWith () {
+      return this.$els.grid.offsetWidth
+    }
   },
   methods: {
   }

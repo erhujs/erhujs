@@ -3,6 +3,7 @@
  *
  * @param
  */
+import RDPMessageFormatter from '../../util/rdp-message-formatter.js'
 import config from '../config.js'
 import Vuex from 'vuex'
 import Vue from 'vue'
@@ -11,19 +12,22 @@ Vue.use(Vuex)
 
 let defaultColumns = getColumns()
 
+let mock = Array.prototype.concat([], defaultColumns)
+mock.shift()
+
 const state = {
   columnsVisibility: config.defaultColumnsVisibility,
   columns: defaultColumns,
-  lists: [],
+  connections: [mock, mock, mock],
 }
 
 const mutations = {
   ADD_NETWORK (state, req) {
-    state.lists.push(parser(req))
+    state.connections.push(parser(req))
   },
 
   DELETE_NETWORK (state, req) {
-    state.lists.$remove(req)
+    state.connections.$remove(req)
   },
 
   TOGGLE_NETWORK (state, req) {
@@ -35,13 +39,13 @@ const mutations = {
   },
 
   TOGGLE_ALL (state, done) {
-    state.lists.forEach((req) => {
+    state.connections.forEach((req) => {
       req.done = done
     })
   },
 
   CLEAR_COMPLETED (state) {
-    state.lists = state.lists.filter(req => !req.done)
+    state.connections = state.connections.filter(req => !req.done)
   }
 }
 

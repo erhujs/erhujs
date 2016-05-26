@@ -37,26 +37,32 @@ export default {
       resContent: ''
     }
   },
-  ready () {
+  created () {
 
-    ipcRenderer.on('request', (event, request) => {
-      console.log('Request', request)
-      this.addNet(request)
-    })
+    // ipcRenderer.on('request', (event, request) => {
+    //   console.log('request', request)
+    // })
+    // ipcRenderer.on('request-data', (event, request) => {
+    //   console.log('request-data', request)
+    // })
+    // ipcRenderer.on('request-end', (event, request) => {
+    //   console.log('request-end', request)
+    // })
+    // ipcRenderer.on('connected', (event, request) => {
+    //   console.log('connected', request)
+    // })
+    // ipcRenderer.on('response', (event, request, response) => {
+    //   console.log('response', response)
+    // })
+    // ipcRenderer.on('response-data', (event, request, response) => {
+    //   console.log('response-data', response)
+    // })
+    
+    // 感觉一个 response-end 就获取到请求和相应的相关数据了... 不过这样好像不是很好，没了过程？
     ipcRenderer.on('response-end', (event, request, response) => {
-      console.log('Response', response)
-      this.resContent = response.data.toString()
+      console.log('response-end', request, response)
     })
-    mock(this)
   }
-}
-
-function mock(vm){
-  vm.addNet(JSON.parse('{"body":{"type":"Buffer","data":[]},"headers":{"accept":"*/*","host":"lib.sinaapp.com","proxy-connection":"Keep-Alive","user-agent":"curl/7.43.0"},"host":"lib.sinaapp.com","id":"SJg51aE2f","method":"GET","url":"http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js","port":80}'))
-
-  vm.addNet(JSON.parse('{"body":{"type":"Buffer","data":[]},"headers":{"accept":"*/*","host":"lib.sinaapp.com","proxy-connection":"Keep-Alive","user-agent":"curl/7.43.0"},"host":"lib.sinaapp.com","id":"SJg51aE2f","method":"GET","url":"http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js","port":80}'))
-
-  vm.addNet(JSON.parse('{"body":{"type":"Buffer","data":[]},"headers":{"accept":"*/*","host":"lib.sinaapp.com","proxy-connection":"Keep-Alive","user-agent":"curl/7.43.0"},"host":"lib.sinaapp.com","id":"SJg51aE2f","method":"GET","url":"http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js","port":80}'))
 }
 
 </script>

@@ -191,7 +191,6 @@ const netColumns = (function(){
       weight: 40,
       sort: ''
   })
-
   return columns
 })()
 

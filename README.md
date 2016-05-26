@@ -10,7 +10,8 @@ npm i
 ## run
 
 ```bash
-npm run start
+npm start		# run develop
+Proxy npm start # for debug 
 ```
 
 ### use vue-devtool

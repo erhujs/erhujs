@@ -14,7 +14,7 @@ let mainWindow
 
 function createWindow() {
 	let mainWindowState = windowStateKeeper({
-		defaultWidth: 1000,
+		defaultWidth: 1100,
 		defaultHeight: 700
 	})
 
@@ -28,7 +28,7 @@ function createWindow() {
 		center: true,
 		skipTaskbar: false,
 		maximizable: false,
-		fullscreenable: false,
+		// fullscreenable: false,
 		autoHideMenuBar: true,
 		titleBarStyle: 'hidden-inset'
 		// frame: false
@@ -62,10 +62,6 @@ function createWindow() {
       mainWindow.webContents.send('response-end', req, res)
     }
   })
-	// netproxy(mainWindow.webContents, options)
-
-	// mainWindow.setMenu(null)
-	// mainWindow.setMenuBarVisibility(false)
 
 	// Load the HTML file directly from the webpack dev server if
 	// hot reload is enabled, otherwise load the local file.
