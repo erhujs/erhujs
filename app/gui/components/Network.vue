@@ -15,7 +15,8 @@
               <th class="{{it.id}}-column sortable" v-for="it in columns">
                 <div class="">
                   {{it.title}}
-                  <div v-if="it.sub" class="header-subtitle">{{it.sub}}</div>  
+                  <div class="header-subtitle">{{it.width}}</div>
+                  <!-- <div v-if="it.sub" class="header-subtitle">{{it.sub}}</div>   -->
                 </div>
               </th>
               <th class="corner"></th>
@@ -66,6 +67,8 @@
 import config from '../store/config.js'
 import networkStore from '../store/network/store.js'
 
+const CenterResizerOverBorderAdjustment = 3
+
 export default {
   name: 'c-network',
   props: {
@@ -108,40 +111,46 @@ export default {
   },
   methods: {
     setColumnsVisiblity () {
-      var tableWidth = this.tableWidth - 24
+      var tableWidth = this.tableWidth - 25
+      var sumOfWeights = this.sumOfWeights - 1
+      var borderWidth = 1
       var sum = 0
-      var lastOffset = 24
+      var lastOffset = 0
 
       this.columns.forEach((item, index) => {
         if(item.id === 'index'){
           item.width = 24
-          item.left = 24  
+          lastOffset = 24 + borderWidth
           return
         }
         sum += item.weight
 
-        var offset = (sum * tableWidth / this.sumOfWeights) | 0
+        var offset = (sum * tableWidth / sumOfWeights) | 0
         var width = (offset - lastOffset)
         
-        item.left = offset
+        console.log(index, sum, width, offset, lastOffset)
+
         item.width = width
-        item.offset = offset
         lastOffset = offset
       })
+      this._positionResizers()
     },
     handlerResizerChange (event) {
       var item = this.columns[this._resizerIndex]
       var lastItem = this.columns[this.columnsLen - 1]
-      var dragPoint = event.clientX - item.offset
-      if(item.width <= 24){
+      var dragPoint = event.clientX - this._target.offsetLeft
+
+      if((item.width <= 24 && dragPoint < 0)
+        || (lastItem.width <= 24 && dragPoint > 0)){
         event.preventDefault()
         return        
       }
-      console.log(dragPoint, item.offset)
-
+      console.log(dragPoint)
+      this.targetDocument.body.style.cursor = 'col-resize'
       item.width = item.width + dragPoint
+      item.__postion = dragPoint
+      item.left = item.__postion
       lastItem.width = lastItem.width - dragPoint
-      item.offset = event.clientX
 
       event.preventDefault()
       this._positionResizers()
@@ -149,24 +158,33 @@ export default {
     handleResizerMouseUp (event) {
       this._resizerId = null
       this._resizerIndex = null
+      this._target = null
       this.targetDocument.removeEventListener('mousemove', this.handlerResizerChange)
       this.targetDocument.removeEventListener('mouseup', this.handleResizerMouseUp)
+      this.targetDocument.body.style.cursor = ''
+      this.targetDocument = null
+
     },
     onResizerMousedown (event) {
       var id = event.target.dataset.id
       var index = event.target.dataset.index
-      
       if(index == 0){
         return 
       }
       this._resizerId = id
       this._resizerIndex = index
+      this._target = event.target
       this.targetDocument = event.target.ownerDocument
       this.targetDocument.addEventListener('mousemove', this.handlerResizerChange)
       this.targetDocument.addEventListener('mouseup', this.handleResizerMouseUp)
     },
     _positionResizers () {
-
+      var borderWidth = 1
+      var offsetWidth = 0
+      this.columns.forEach((item, index) => {
+        offsetWidth += item.width
+        item.left = offsetWidth
+      })
     }
   }
 }
@@ -784,5 +802,6 @@ export default {
   bottom 0
   width 5px
   z-index 500
+  background-color rgba(255,0,0,.2)
   
 </style>

@@ -89,7 +89,7 @@ function getColumns(){
   config.defaultColumns.forEach( (item) => {
     if(config.defaultColumnsVisibility[item.id]){
       item.width = 24
-      item.left = 1
+      item.left = 0
       columns.push(item)   
     }
   })
