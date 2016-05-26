@@ -3,7 +3,7 @@
     <div class="pane pane-sm sidebar" v-show="barStatus">
       <c-sidebar></c-sidebar>  
     </div>
-    <div class="pane">
+    <div class="pane vbox">
       <c-network></c-network>
     </div>
     <div class="pane pane-sm">
@@ -48,5 +48,8 @@ export default {
 </script>
 
 <style lang="stylus">
-
+.vbox
+  display flex
+  flex-direction column !important
+  position relative
 </style>

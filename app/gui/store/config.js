@@ -68,7 +68,7 @@ const netColumns = (function(){
   columns.push({
     id: "index",
     title: "#",
-    weight: 1
+    weight: 0
   })
 
   columns.push({

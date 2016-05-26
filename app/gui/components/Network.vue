@@ -1,15 +1,18 @@
 <template>
-  <div class="c-network">
+  <div class="c-network vbox">
     <div class="filter-bar">
       filter
     </div>
     <div class="data-grid network-log-grid" v-el:grid>
       <div class="header-container">
         <table class="header">
-          <colgroup></colgroup>
+          <colgroup>
+            <col :style="{width: it.width + 'px'}" v-for="it in columns">
+            <col class="corner">
+          </colgroup>
           <tbody>
             <tr>
-              <th class="{{it.id}}-column" v-for="it in columns">
+              <th class="{{it.id}}-column sortable" v-for="it in columns">
                 <div class="">
                   {{it.title}}
                   <div v-if="it.sub" class="header-subtitle">{{it.sub}}</div>  
@@ -22,9 +25,14 @@
       </div>
       <div class="data-container">
         <table class="data">
+          <colgroup>
+            <col :style="{width: it.width + 'px'}" v-for="it in columns">
+            <col class="corner">
+          </colgroup>
           <tbody>
-            <tr v-for="connection in connections" track-by="$index">
-              <td>{{$index}}</td> 
+            <tr class="revealed" v-for="connection in connections" track-by="$index"
+              :class="{odd: ($index % 2) === 0}">
+              <td class="index-column">{{$index}}</td> 
               <td class="{{ct.id}}-column" v-for="ct in connection">
                 <div class="">
                   {{ct.title}}
@@ -33,9 +41,23 @@
               </td>
               <td class="corner"></td>
             </tr>
+            <tr class="revealed data-grid-filler-row">
+              <td class="{{it.id}}-column bottom-filler-td" v-for="it in columns">
+              </td>
+              <td class="corner bottom-filler-td"></td>
+            </tr>
           </tbody>
         </table>
       </div>
+      
+      <div class="data-grid-resizer"
+        v-for="it in columns"
+        data-id="{{it.id}}"
+        data-index="{{$index}}"
+        :style="{left: it.left + 'px'}"
+        @mousedown="onResizerMousedown"
+        ></div>
+
     </div>
   </div>
 </template>
@@ -56,28 +78,314 @@ export default {
       columnsVisibility: state => state.columnsVisibility,
     }
   },
-  ready () {
-    console.log(this.$els.grid)
-    console.log(this.headerTableColumns, this.tableWith)
-    console.log(this.columnsVisibility, this.columns)
-  },
   computed:{
-    headerTableColumns () {
+    columnsLen () {
       return this.columns.length
     },
-    tableWith () {
+    tableWidth () {
       return this.$els.grid.offsetWidth
+    },
+    sumOfWeights () {
+      let val = 0
+      this.columns.forEach((item) => {
+        val += item.weight
+      })
+      return val
     }
   },
+  filters: {
+    removeResizer (columns) {
+      var col = columns
+      col.pop()
+      col.shift()
+      return col
+    }
+  },
+  created () {
+  },
+  ready () {
+    this.setColumnsVisiblity()
+  },
   methods: {
+    setColumnsVisiblity () {
+      var tableWidth = this.tableWidth - 24
+      var sum = 0
+      var lastOffset = 24
+
+      this.columns.forEach((item, index) => {
+        if(item.id === 'index'){
+          item.width = 24
+          return
+        }
+        sum += item.weight
+
+        var offset = (sum * tableWidth / this.sumOfWeights) | 0
+        var width = (offset - lastOffset)
+        
+        item.left = offset
+        item.offset = offset
+        lastOffset = offset
+      })
+    },
+    handlerResizerChange (event) {
+      var item = this.columns[this._resizerIndex]
+      var lastItem = this.columns[this.columnsLen - 1]
+      var dragPoint = event.clientX - item.offset
+      if(item.width <= 24){
+        event.preventDefault()
+        return        
+      }
+      console.log(dragPoint, item.offset)
+
+      item.width = item.width + dragPoint
+      lastItem.width = lastItem.width - dragPoint
+      item.offset = event.clientX
+
+      event.preventDefault()
+      this._positionResizers()
+    },
+    handleResizerMouseUp (event) {
+      this._resizerId = null
+      this._resizerIndex = null
+      this.targetDocument.removeEventListener('mousemove', this.handlerResizerChange)
+      this.targetDocument.removeEventListener('mouseup', this.handleResizerMouseUp)
+    },
+    onResizerMousedown (event) {
+      var id = event.target.dataset.id
+      var index = event.target.dataset.index
+      
+      if(index == 0){
+        return 
+      }
+      this._resizerId = id
+      this._resizerIndex = index
+      this.targetDocument = event.target.ownerDocument
+      this.targetDocument.addEventListener('mousemove', this.handlerResizerChange)
+      this.targetDocument.addEventListener('mouseup', this.handleResizerMouseUp)
+    },
+    _positionResizers () {
+
+    }
   }
 }
 </script>
 
 <style lang="stylus">
 .c-network
+  overflow hidden
+  flex 1
   .filter-bar
     display none
+
+
+.vbox
+  display flex
+  flex-direction column !important
+  position relative
+
+
+.data-grid
+  position relative
+  border 1px solid #aaa
+  font-size 11px
+  line-height 120%
+  table
+    table-layout fixed
+    border-spacing 0
+    border-collapse separate
+    height 100%
+    width 100%
+    &.data
+      position absolute
+      left 0
+      top 0
+      right 0
+      bottom 0
+      border-top 0 none transparent
+      background-image linear-gradient(to bottom, white, white 50%, rgb(234, 243, 255) 50%, rgb(234, 243, 255))
+      background-size 128px 32px
+      table-layout fixed
+      tr
+        display none
+        &:active
+          color none
+          background-color none
+        &.revealed
+          display table-row
+  .header-container
+    top 0
+    height 17px
+  .data-container
+    top 17px
+    bottom 0
+    overflow-y overlay
+    transform translateZ(0)
+  &.inline
+    .corner
+      display none
+    table
+      &.data
+        position static
+  .corner
+    width 14px
+    padding-right 0
+    padding-left 0
+    border-left 0 none transparent !important
+  td
+    height 16px
+    vertical-align top
+    padding 1px 4px
+    -webkit-user-select text
+    &.editing
+      & > div
+        text-overflow clip
+    &.disclosure
+      &::before
+        -webkit-user-select none
+        -webkit-mask-image url(../assets/images/toolbarButtonGlyphs.png)
+        -webkit-mask-position -4px -96px
+        -webkit-mask-size 352px 168px
+        float left
+        width 8px
+        height 12px
+        margin-right 2px
+        content "a"
+        color transparent
+        position relative
+        top 1px
+        background-color rgb(110, 110, 110)
+  th
+    height auto
+    text-align left
+    background-color #eee
+    border-bottom 1px solid #aaa
+    font-weight normal
+    vertical-align middle
+    padding 0 4px
+    &.sortable
+      position relative
+      &:active
+        background-color rgba(0, 0, 0, 0.15)
+    .sort-order-icon-container
+      position absolute
+      top 1px
+      right 0
+      bottom 1px
+      display flex
+      align-items center
+    .sort-order-icon
+      margin-right 4px
+      background-image url(../assets/images/toolbarButtonGlyphs.png)
+      background-size 352px 168px
+      opacity 0.5
+      width 8px
+      height 7px
+      display none
+    &.sort-ascending
+      .sort-order-icon
+        display block
+        background-position -4px -111px
+    &.sort-descending
+      .sort-order-icon
+        display block
+        background-position -20px -99px
+    &:hover
+      background-color hsla(0, 0%, 90%, 1)
+  .center
+    text-align center
+  .right
+    text-align right
+  button
+    line-height 18px
+    color inherit
+  tr
+    &:not(.parent)
+      td
+        &.disclosure
+          &::before
+            background-color transparent
+    &.expanded
+      td
+        &.disclosure
+          &::before
+            -webkit-mask-position -20px -96px
+    &.selected
+      background-color rgb(212, 212, 212)
+      color inherit
+  &:focus
+    tr
+      &.selected
+        background-color rgb(56, 121, 217)
+        color white
+        a
+          color white
+      &.parent
+        &.selected
+          td
+            &.disclosure
+              &::before
+                background-color white
+                -webkit-mask-position -4px -96px
+      &.expanded
+        &.selected
+          td
+            &.disclosure
+              &::before
+                background-color white
+                -webkit-mask-position -20px -96px
+
+.data-grid .header-container,
+.data-grid .data-container
+  position absolute
+  left 0
+  right 0
+  overflow-x hidden
+
+.data-grid.inline .header-container,
+.data-grid.inline .data-container
+  position static
+
+.platform-mac .data-grid .corner,
+.data-grid.data-grid-fits-viewport .corner
+  display none
+
+.data-grid .top-filler-td,
+.data-grid .bottom-filler-td
+  height auto !important
+  padding 0 !important
+
+.data-grid td,
+.data-grid th
+  white-space nowrap
+  text-overflow ellipsis
+  overflow hidden
+  line-height 14px
+  border-left 1px solid #aaa
+
+.data-grid th:first-child,
+.data-grid td:first-child
+  border-left none !important
+
+.data-grid td > div,
+.data-grid th > div
+  white-space nowrap
+  text-overflow ellipsis
+  overflow hidden
+
+@media (-webkit-min-device-pixel-ratio: 1.5)
+  .data-grid
+    th
+      .sort-order-icon
+        background-image url(../assets/images/toolbarButtonGlyphs_2x.png)
+
+@media (-webkit-min-device-pixel-ratio: 1.5)
+  .data-grid
+    tr
+      &.parent
+        td
+          &.disclosure
+            &::before
+              -webkit-mask-image url(../assets/images/toolbarButtonGlyphs_2x.png)
 
 .network-log-grid
   &.data-grid
@@ -125,6 +433,7 @@ export default {
         max-width 8px
         max-height 11px
     th
+      border-right none
       border-bottom 1px solid rgb(205, 205, 205)
       border-left 1px solid rgb(205, 205, 205)
       background white
@@ -144,6 +453,9 @@ export default {
       border none
       width 100%
       color inherit
+    .index-column
+      width 28px
+      text-align center
     .name-column
       cursor pointer
     .timeline-column
@@ -462,4 +774,13 @@ export default {
     font-size 14px
     text-align center
     line-height 28px
+    
+.data-grid-resizer
+  cursor col-resize
+  position absolute
+  top 0
+  bottom 0
+  width 5px
+  z-index 500
+  
 </style>

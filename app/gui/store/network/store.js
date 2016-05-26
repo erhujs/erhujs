@@ -18,7 +18,7 @@ mock.shift()
 const state = {
   columnsVisibility: config.defaultColumnsVisibility,
   columns: defaultColumns,
-  connections: [mock, mock, mock],
+  connections: [mock, mock, mock, mock],
 }
 
 const mutations = {
@@ -88,6 +88,8 @@ function getColumns(){
   
   config.defaultColumns.forEach( (item) => {
     if(config.defaultColumnsVisibility[item.id]){
+      item.width = 24
+      item.left = 1
       columns.push(item)   
     }
   })
