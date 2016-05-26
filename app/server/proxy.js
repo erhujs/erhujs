@@ -15,17 +15,23 @@ MITMProxyPatch(MITMProxy.Proxy)
 
 function createProxy(opts, callbacks) {
   let proxy = new MITMProxy()
+  let InterHttpProxy = process.env['http_proxy'] || process.env['HTTP_PROXY']
+  let InterHttpsProxy = process.env['https_proxy'] || process.env['HTTPS_PROXY'] || InterHttpProxy
 
   proxy.onError((ctx, err) => {
     debug('Error', err)
   })
 
   proxy.onConnect(function (req, socket, head, callback) {
+    /**
+     * HTTPS/Websocket fly CONNECT request in proxy mode
+     */
     let id = shortid.generate()
     let debug = bindDebug(`#${id}`)
     let urlObj = url.parse(`https://${req.url}`)
     let host = urlObj.hostname
     let port = urlObj.port || 443
+
     let method = 'TUNNEL'
     let request = {
       id,
@@ -47,7 +53,28 @@ function createProxy(opts, callbacks) {
       statusMessage: '',
       headers: {}
     }
+    debug('HTTPS proxy', InterHttpsProxy)
     debug('Tunnel to', req.url)
+
+    /**
+     * Using proxy in internal request
+     */
+    if (InterHttpsProxy) {
+      let pObj = url.parse(InterHttpsProxy)
+      let pPort = pObj.port || 443
+      let pHost = pObj.hostname
+      let pConn = net.connect(pPort, pHost, () => {
+        pConn.write(
+          `CONNECT ${host}:${port} HTTP/1.1\r\nHost: ${host}\r\nUser-Agent: ${req.headers['user-agent']}\r\n\r\n`,
+          'UTF-8',
+          () => {
+            pConn.pipe(socket)
+            socket.pipe(pConn)
+          })
+      })
+      return
+    }
+
     /**
      * @event request
      */
@@ -56,41 +83,45 @@ function createProxy(opts, callbacks) {
      * @event request
      */
     emitEvent(callbacks.onRequestEnd, request)
-    let conn = net.connect(port, host, function(){
-      debug('Tunnel connected', conn.remoteAddress)
-      request.remoteAddress = conn.remoteAddress
-      /**
-       * @event connected
-       */
-      emitEvent(callbacks.onConnected, request)
-      socket.write('HTTP/1.1 200 OK\r\n\r\n', 'UTF-8', function(){
-        debug('Tunnel response')
+    makeConnection(port, host)
+
+    function makeConnection(port, host) {
+      let conn = net.connect(port, host, function(){
+        debug('Tunnel connected', conn.remoteAddress)
+        request.remoteAddress = conn.remoteAddress
         /**
-         * @event response
+         * @event connected
          */
-        emitEvent(callbacks.onResponse, request, response)
-        conn.pipe(socket)
-        socket.pipe(conn)
+        emitEvent(callbacks.onConnected, request)
+        socket.write('HTTP/1.1 200 OK\r\n\r\n', 'UTF-8', function(){
+          debug('Tunnel response')
+          /**
+           * @event response
+           */
+          emitEvent(callbacks.onResponse, request, response)
+          conn.pipe(socket)
+          socket.pipe(conn)
+        })
       })
-    })
-    conn.on('data', function (chunk) {
-      response.data = Buffer.concat([response.data, chunk], response.data.length + chunk.length)
-      /**
-       * @event responseData
-       */
-      emitEvent(callbacks.onResponseData, chunk)
-    })
-    conn.on('end', function () {
-      debug('Tunnel end')
-      /**
-       * @event responseEnd
-       */
-      emitEvent(callbacks.onResponseEnd, request, response)
-    })
-    conn.on('error',function(e){
-      debug('Tunnel error', e)
-      response.statusMessage = e.message || error
-    })
+      conn.on('data', function (chunk) {
+        response.data = Buffer.concat([response.data, chunk], response.data.length + chunk.length)
+        /**
+         * @event responseData
+         */
+        emitEvent(callbacks.onResponseData, chunk)
+      })
+      conn.on('end', function () {
+        debug('Tunnel end')
+        /**
+         * @event responseEnd
+         */
+        emitEvent(callbacks.onResponseEnd, request, response)
+      })
+      conn.on('error',function(e){
+        debug('Tunnel error', e)
+        response.statusMessage = e.message || error
+      })
+    }
   })
   proxy.onRequest(function (ctx, calback) {
     let id = shortid.generate()
@@ -100,10 +131,9 @@ function createProxy(opts, callbacks) {
     let host = req.headers.host || urlObj.host
     let port = url.parse(host).port || 80
     let method = req.method
-    let internalProxy = process.env['http_proxy'] || process.env['HTTP_PROXY']
 
-    if (internalProxy) {
-      var proxyObj = url.parse(internalProxy)
+    if (InterHttpProxy) {
+      var proxyObj = url.parse(InterHttpProxy)
       if (!proxyObj.hostname) return
       var reqOpts = ctx.proxyToServerRequestOptions
       Object.assign(reqOpts, {
@@ -111,7 +141,7 @@ function createProxy(opts, callbacks) {
         port: proxyObj.port || 80,
         path: `http://${host}${port == 80 ? '':':'+port}${urlObj.path || '/'}`
       })
-      debug('HTTP proxy', internalProxy)
+      debug('HTTP proxy', InterHttpProxy)
     }
 
     debug('HTTP request', req.url)
