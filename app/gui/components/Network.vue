@@ -115,6 +115,7 @@ export default {
       this.columns.forEach((item, index) => {
         if(item.id === 'index'){
           item.width = 24
+          item.left = 24  
           return
         }
         sum += item.weight
@@ -123,6 +124,7 @@ export default {
         var width = (offset - lastOffset)
         
         item.left = offset
+        item.width = width
         item.offset = offset
         lastOffset = offset
       })
