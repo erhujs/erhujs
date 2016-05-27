@@ -60,7 +60,7 @@ export default {
     
     // 感觉一个 response-end 就获取到请求和相应的相关数据了... 不过这样好像不是很好，没了过程？
     ipcRenderer.on('response-end', (event, request, response) => {
-      console.log('response-end', request, response)
+      this.addNet(request, response)
     })
   }
 }

@@ -1,16 +1,16 @@
 'use strict'
 
-import url from 'url'
+// import url from 'url'
 // import zlib from 'zlib'
-import isTextOrBinary from 'istextorbinary'
+// import isTextOrBinary from 'istextorbinary'
 
-export function fullUrl(req, isSSL) {
-  let parsedUrl = url.parse(req.url)
-  parsedUrl.protocol = isSSL ? 'https' : 'http'
-  parsedUrl.host = req.headers.host
+// export function fullUrl(req, isSSL) {
+//   let parsedUrl = url.parse(req.url)
+//   parsedUrl.protocol = isSSL ? 'https' : 'http'
+//   parsedUrl.host = req.headers.host
 
-  return url.format(parsedUrl)
-}
+//   return url.format(parsedUrl)
+// }
 
 /**
  * TODO should be async
@@ -42,20 +42,20 @@ export function fullUrl(req, isSSL) {
  * @param
  */
 
-export function isBinary(contentType, buffer) {
-  let type = getResourceType(contentType)
+// export function isBinary(contentType, buffer) {
+//   let type = getResourceType(contentType)
 
-  //TODO Image is not always binary (SVG)
-  if (type === 'Image' || type === 'Media' || type === 'Font') {
-    return true
-  }
+//   //TODO Image is not always binary (SVG)
+//   if (type === 'Image' || type === 'Media' || type === 'Font') {
+//     return true
+//   }
 
-  if (type === 'Other' && isTextOrBinary.isBinarySync(buffer)) {
-    return true
-  }
+//   if (type === 'Other' && isTextOrBinary.isBinarySync(buffer)) {
+//     return true
+//   }
 
-  return false
-}
+//   return false
+// }
 
 /**
  * See https://chromedevtools.github.io/debugger-protocol-viewer/Page/#type-ResourceType
@@ -64,7 +64,8 @@ export function isBinary(contentType, buffer) {
  * @param
  */
 
-export function getResourceType(contentType) {
+function getResourceType(contentType) {
+  console.log(contentType)
   if (contentType && contentType.match) {
     if (contentType.match('text/css')) {
       return 'Stylesheet'
@@ -97,10 +98,10 @@ export function getResourceType(contentType) {
  * @param
  */
 
-export function recreateRawResponseHeaders(res) {
+function recreateRawResponseHeaders(res) {
   let headerString = ''
 
-  for (let i = 0, l = res.rawHeaders.length i < l i += 2) {
+  for (let i = 0, l = res.rawHeaders.length; i < l; i += 2) {
     headerString += res.rawHeaders[i] + ': ' + res.rawHeaders[i + 1] + '\n'
   }
 
@@ -114,7 +115,7 @@ export function recreateRawResponseHeaders(res) {
  * @param
  */
 
-export function flattenHeaders (headers) {
+function flattenHeaders (headers) {
   let flatHeaders = {}
 
   for (let name in headers) {
@@ -128,4 +129,11 @@ export function flattenHeaders (headers) {
   }
 
   return flatHeaders
+}
+
+
+export default {
+  getResourceType,
+  recreateRawResponseHeaders,
+  flattenHeaders
 }

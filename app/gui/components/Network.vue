@@ -15,8 +15,8 @@
               <th class="{{it.id}}-column sortable" v-for="it in columns">
                 <div class="">
                   {{it.title}}
-                  <div class="header-subtitle">{{it.width}}</div>
-                  <!-- <div v-if="it.sub" class="header-subtitle">{{it.sub}}</div>   -->
+                  <div v-if="it.sub" class="header-subtitle">{{it.sub}}</div>  
+                  <div class="_test-tips">{{it.width}}</div>
                 </div>
               </th>
               <th class="corner"></th>
@@ -31,10 +31,11 @@
             <col class="corner">
           </colgroup>
           <tbody>
+            <!-- main info -->
             <tr class="revealed" v-for="connection in connections" track-by="$index"
               :class="{odd: ($index % 2) === 0}">
               <td class="index-column">{{$index}}</td> 
-              <td class="{{ct.id}}-column" v-for="ct in connection">
+              <td class="{{ct.id}}-column {{ct.align ? ct.align : ''}}" v-for="ct in connection">
                 <div class="">
                   {{ct.title}}
                   <div v-if="ct.sub" class="network-cell-subtitle">{{ct.sub}}</div>  
@@ -42,6 +43,7 @@
               </td>
               <td class="corner"></td>
             </tr>
+            <!-- bottom -->
             <tr class="revealed data-grid-filler-row">
               <td class="{{it.id}}-column bottom-filler-td" v-for="it in columns">
               </td>
@@ -128,7 +130,7 @@ export default {
         var offset = (sum * tableWidth / sumOfWeights) | 0
         var width = (offset - lastOffset)
         
-        console.log(index, sum, width, offset, lastOffset)
+        // console.log(index, sum, width, offset, lastOffset)
 
         item.width = width
         lastOffset = offset
@@ -145,7 +147,7 @@ export default {
         event.preventDefault()
         return        
       }
-      console.log(dragPoint)
+      // console.log(dragPoint)
       this.targetDocument.body.style.cursor = 'col-resize'
       item.width = item.width + dragPoint
       item.__postion = dragPoint
@@ -802,6 +804,11 @@ export default {
   bottom 0
   width 5px
   z-index 500
-  background-color rgba(255,0,0,.2)
+  background-color rgba(255,0,0,.1)
   
+
+._test-tips
+  position absolute
+  right 0
+  top 0
 </style>

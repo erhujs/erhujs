@@ -4,11 +4,12 @@
  * @param
  */
 import RDPMessageFormatter from '../../util/rdp-message-formatter.js'
+import capturedConnection from '../../util/captured-connection.js'
 import config from '../config.js'
 import Vuex from 'vuex'
 import Vue from 'vue'
 Vue.use(Vuex)
-
+console.log(capturedConnection)
 
 let defaultColumns = getColumns()
 
@@ -18,12 +19,12 @@ mock.shift()
 const state = {
   columnsVisibility: config.defaultColumnsVisibility,
   columns: defaultColumns,
-  connections: [mock, mock, mock, mock],
+  connections: [],
 }
 
 const mutations = {
-  ADD_NETWORK (state, req) {
-    state.connections.push(parser(req))
+  ADD_NETWORK (state, req, res) {
+    state.connections.push(parser(state, req, res))
   },
 
   DELETE_NETWORK (state, req) {
@@ -49,20 +50,25 @@ const mutations = {
   }
 }
 
-function parser (req) {
-  return {
+function parser (state, req, res) {
+  console.log(req, res)
+  console.log(capturedConnection.getResourceType(res.headers['content-type']), res.headers['content-type'])
+  let _parserValue = {
     "name": req.url,
+    "path": req.path,
     "method": req.method,
-    "status": req.statusCode || 200,
+    "status": res.statusCode,
+    "statusText": res.statusMessage,
     "protocol": "Protocol",
     "scheme": "Scheme",
     "domain": req.host,
     "remoteAddress": "Remote Address",
-    "type": "Type",
+    "type": capturedConnection.getResourceType(res.headers['content-type']),
     "initiator": "Initiator",
     "cookies": "Cookies",
     "setCookies": "Set-Cookies",
-    "size": req.body.length,
+    "size": '100kb',
+    "sizeContent": '100kb',
     "time": "Time",
     "connectionId": "Connection Id",
     "priority": "Priority",
@@ -79,8 +85,21 @@ function parser (req) {
     "Server": "Server",
     "Vary": "Vary"
   }
+  let connection = []
 
-  return columns
+  state.columns.forEach( (item) => {
+    if(item.id === 'index'){
+      return
+    }
+    connection.push({
+      id: item.id,
+      title: _parserValue[item.id],
+      subId: item.subId,
+      sub: _parserValue[item.subId],
+    })
+  })
+
+  return connection
 }
 
 function getColumns(){

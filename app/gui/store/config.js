@@ -74,6 +74,7 @@ const netColumns = (function(){
   columns.push({
       id: "name",
       title: _columnTitles["name"],
+      subId: "path",
       sub: 'Path',
       weight: 20
   })
@@ -86,8 +87,9 @@ const netColumns = (function(){
 
   columns.push({
       id: "status",
-      sub: _columnSubTitles["status"],
+      subId: "statusText",
       title: _columnTitles["status"],
+      sub: _columnSubTitles["status"],
       weight: 6
   })
 
@@ -145,6 +147,7 @@ const netColumns = (function(){
   columns.push({
       id: "size",
       title: _columnTitles["size"],
+      subId: "sizeContent",
       sub: _columnSubTitles["size"],
       weight: 6,
       align: 'right'
@@ -153,6 +156,7 @@ const netColumns = (function(){
   columns.push({
       id: "time",
       title: _columnTitles["time"],
+      sub: "latency",
       sub: "Latency",
       weight: 6,
       align: 'right'
