@@ -63,15 +63,82 @@ function createProxy(opts, callbacks) {
       let pObj = url.parse(InterHttpsProxy)
       let pPort = pObj.port || 443
       let pHost = pObj.hostname
-      let pConn = net.connect(pPort, pHost, () => {
-        pConn.write(
-          `CONNECT ${host}:${port} HTTP/1.1\r\nHost: ${host}\r\nUser-Agent: ${req.headers['user-agent']}\r\n\r\n`,
-          'UTF-8',
-          () => {
-            pConn.pipe(socket)
-            socket.pipe(pConn)
+
+      // WS proxy detect and tunnel
+      function detectWSTunnel () {
+        socket.write('HTTP/1.1 200 Connection established\r\n\r\n', 'UTF-8', () => {
+          socket.once('data', (head) => {
+            let headStr = head.toString()
+            if (/^GET/.test(headStr)) {
+              // WS proxy
+              let conn = net.connect(opts.port || 8888, () => {
+                socket.pipe(conn)
+                conn.pipe(socket)
+                socket.emit('data', head)
+              })
+              conn.on('data', (chunk) => {
+                console.log('WS Response', chunk.toString())
+              })
+              socket.on('close', () => {
+                console.log('WS Client close', req.url)
+                conn.end()
+              })
+              conn.on('error', (e) => {
+                console.log('WS connection error', req.url, e)
+                conn.destroy()
+              })
+              conn.on('close', () => {
+                console.log('WS Server close', req.url)
+                socket.end()
+              })
+            } else {
+              // Tunnel
+              let pConn = net.connect(pPort, pHost, () => {
+                pConn.write(
+                  `CONNECT ${host}:${port} HTTP/1.1\r\nHost: ${host}\r\nUser-Agent: ${req.headers['user-agent']}\r\n\r\n`,
+                  'UTF-8',
+                  () => {
+                    console.log('Tunnel CONNECT', req.url)
+                    pConn.once('data', (chunk) => {
+                      socket.pipe(pConn)
+                      pConn.pipe(socket)
+                      socket.emit('data', head)
+                    })
+                  })
+              })
+              socket.on('close', () => {
+                console.log('Tunnel Client close', req.url)
+                pConn.end()
+                pConn.destroy()
+              })
+              pConn.on('error', (e) => {
+                console.log('Tunnel Connection error', req.url, e)
+                pConn.destroy()
+              })
+              pConn.on('close', () => {
+                console.log('Tunnel Server close', req.url)
+                socket.end()
+                socket.destroy()
+              })
+            }
           })
-      })
+        })
+      }
+
+      // preoxy tunnel
+      function tunnel() {
+        let pConn = net.connect(pPort, pHost, () => {
+          pConn.write(
+            `CONNECT ${host}:${port} HTTP/1.1\r\nHost: ${host}\r\nUser-Agent: ${req.headers['user-agent']}\r\n\r\n`,
+            'UTF-8',
+            () => {
+              socket.pipe(pConn)
+              pConn.pipe(socket)
+            })
+        })
+      }
+      // detectWSTunnel()
+      tunnel()
       return
     }
 
@@ -276,6 +343,7 @@ function createProxy(opts, callbacks) {
  */
 function handleWebsocket(options, proxy) {
   proxy.onWebSocketConnection((ctx, cb) => {
+    console.log('### WS connection')
     let id = shortid.generate()
     let debug = bindDebug(`#${id}`)
     debug('WS connect')
