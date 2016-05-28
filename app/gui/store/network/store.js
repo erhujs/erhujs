@@ -50,9 +50,15 @@ const mutations = {
   }
 }
 
+/**
+ * parser connection 
+ * TODO 很多字段没有补全
+ *
+ * @param
+ */
+
 function parser (state, req, res) {
-  console.log(req, res)
-  console.log(capturedConnection.getResourceType(res.headers['content-type']), res.headers['content-type'])
+  let connection = []
   let _parserValue = {
     "name": req.url,
     "path": req.path,
@@ -85,7 +91,6 @@ function parser (state, req, res) {
     "Server": "Server",
     "Vary": "Vary"
   }
-  let connection = []
 
   state.columns.forEach( (item) => {
     if(item.id === 'index'){
@@ -101,6 +106,12 @@ function parser (state, req, res) {
 
   return connection
 }
+
+/**
+ * get columns by defaultColumns and defaultColumnsVisibility
+ *
+ * @return {Array} columns
+ */
 
 function getColumns(){
   let columns = []
