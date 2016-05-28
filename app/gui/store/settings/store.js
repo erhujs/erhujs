@@ -10,7 +10,7 @@ import Vue from 'vue'
 Vue.use(Vuex)
 
 const state = {
-  bar: true,
+  bar: false,
   sidebar: [{
     id: 'favorites',
     title: 'Favorites',
