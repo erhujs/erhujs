@@ -44,6 +44,9 @@
       <button class="btn btn-default btn-dropdown pull-right">
         <span class="icon icon-cog"></span>
       </button>
+      <div class="pull-right">
+        <p-search></p-search>  
+      </div>
     </div>
   </header>
 </template>

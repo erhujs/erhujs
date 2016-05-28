@@ -1,39 +1,29 @@
 <template>
 <div class="c-sidebar">
-  <nav class="nav-group">
-    <h5 class="nav-group-title">Favorites</h5>
-    <a class="nav-group-item active">
-      <span class="icon icon-home"></span>
-      connors
-    </a>
-    <span class="nav-group-item">
-      <span class="icon icon-download"></span>
-      Downloads
-    </span>
-    <span class="nav-group-item">
-      <span class="icon icon-folder"></span>
-      Documents
-    </span>
-    <span class="nav-group-item">
-      <span class="icon icon-signal"></span>
-      AirPlay
-    </span>
-    <span class="nav-group-item">
-      <span class="icon icon-print"></span>
-      Applications
-    </span>
-    <span class="nav-group-item">
-      <span class="icon icon-cloud"></span>
-      Desktop
+  <!-- sidebar group -->
+  <nav class="nav-group" v-for="group in sidebar">
+    <h5 class="nav-group-title">{{group.title}}</h5>
+    <span class="nav-group-item" 
+      v-for="item in group.list"
+      :class="{active: item.active}">
+      <span class="icon icon-{{item.icon}}" :style="{color: item.color ? item.color : ''}"></span>
+      {{item.title}}
     </span>
   </nav>
 </div>
 </template>
 
 <script>
+import settingsStore from '../store/settings/store.js'
 
 export default {
   name: 'c-sidebar',
+  store: settingsStore,
+  vuex: {
+    getters:{
+      sidebar: state => state.sidebar
+    }
+  },
   props: {
     
   },
@@ -43,5 +33,6 @@ export default {
 </script>
 
 <style lang="stylus">
-
+.c-sidebar
+  overflow hidden
 </style>

@@ -29,6 +29,7 @@ Vue.component('p-tab-group', photon.TabGroup)
 Vue.component('p-tabitem', photon.TabItem)
 Vue.component('p-table', photon.Table)
 Vue.component('p-textarea', photon.TextArea)
+Vue.component('p-search', photon.Search)
 
 new Vue({
   el: 'body',

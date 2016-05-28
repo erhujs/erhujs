@@ -20,6 +20,8 @@ import TabItem from './tab-item.vue'
 import Table from './table.vue'
 import TextArea from './textarea.vue'
 
+import Search from './search.vue'
+
 
 export default {
   Actionbar,
@@ -41,5 +43,6 @@ export default {
   TabGroup,
   TabItem,
   Table,
-  TextArea
+  TextArea,
+  Search
 }
