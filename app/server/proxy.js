@@ -25,6 +25,7 @@ function createProxy(opts, callbacks) {
   })
 
   proxy.onConnect(function (req, socket, head, callback) {
+
     /**
      * HTTPS/Websocket fly CONNECT request in proxy mode
      */
@@ -151,11 +152,18 @@ function createProxy(opts, callbacks) {
         let lwHeadStr = headStr.toLowerCase()
         // "WSS" will passthrough as https, only proxy "WS"
         if (/^GET/.test(headStr) && /\bupgrade:\s*websocket\b/.test(lwHeadStr) && /\bconnection:\s*upgrade\b/.test(lwHeadStr)) {
-          passThrough.webscoket(head)
-        } else if (interHttpsProxy) {
-          passThrough.proxy(head, interHttpsProxy)
+          return passThrough.webscoket(head)
+        }
+        // currently decrypt HTTPS will cause SSL_error
+        let decrypt = false
+        if (decrypt) {
+          proxy._onHttpServerConnectData(req, socket, head)
         } else {
-          passThrough.tunnel(head)
+          if (interHttpsProxy) {
+            passThrough.proxy(head, interHttpsProxy)
+          } else {
+            passThrough.tunnel(head)
+          }
         }
       })
     })
@@ -169,21 +177,25 @@ function createProxy(opts, callbacks) {
     let host = req.headers.host || urlObj.host
     let port = url.parse(host).port || 80
     let method = req.method
+    let proxyServer
+
+    if (ctx.isSSL) proxyServer = interHttpsProxy
+    else proxyServer = interHttpProxy
 
     // ignore HTTPS cert errors
-    ctx.proxyToServerRequest.rejectUnauthorized = false
+    ctx.proxyToServerRequestOptions.rejectUnauthorized = false
 
-    if (interHttpProxy) {
-      var parsedProxy = url.parse(interHttpProxy)
-
+    if (proxyServer) {
+      let parsedProxy = url.parse(proxyServer)
+      let reqOpts = ctx.proxyToServerRequestOptions
       if (!parsedProxy.hostname) return
-      var reqOpts = ctx.proxyToServerRequestOptions
+
       Object.assign(reqOpts, {
         host: parsedProxy.hostname,
         port: parsedProxy.port || 80,
-        path: `http://${host}${port == 80 ? '':':'+port}${urlObj.path || '/'}`
+        path: `${ctx.isSSL?'https':'http'}://${host}${port == 80 ? '':':'+port}${urlObj.path || '/'}`
       })
-      debug('HTTP proxy', interHttpProxy)
+      debug('HTTP proxy', proxyServer)
     }
 
     debug('HTTP request', req.url)
