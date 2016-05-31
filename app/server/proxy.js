@@ -10,13 +10,15 @@ const shortid = require('shortid')
 const httpolyglot = require('httpolyglot')
 const MITMProxy = require('http-mitm-proxy');
 const debug = require('debug')('Proxy')
+const HttpsProxyAgent = require('https-proxy-agent');
 const MITMProxyPatch = require('./lib/mitm-proxy-patch')
 MITMProxyPatch(MITMProxy.Proxy)
 
 function createProxy(opts, callbacks) {
   let proxy = new MITMProxy()
-  let InterHttpProxy = process.env['http_proxy'] || process.env['HTTP_PROXY']
-  let interHttpsProxy = process.env['https_proxy'] || process.env['HTTPS_PROXY'] || InterHttpProxy
+  let proxies = getProxy()
+  let interHttpProxy = proxies.http
+  let interHttpsProxy = proxies.https
 
   proxy.onError((ctx, err) => {
     debug('Error', err)
@@ -53,7 +55,6 @@ function createProxy(opts, callbacks) {
       statusMessage: '',
       headers: {}
     }
-    interHttpsProxy && debug('HTTPS proxy', interHttpsProxy)
     debug('Tunnel to', req.url)
 
     let passThrough = {
@@ -80,7 +81,7 @@ function createProxy(opts, callbacks) {
 
         let conn = net.connect(pPort, pHost, () => {
           conn.write(
-            `CONNECT ${host}:${port} HTTP/1.1\r\nHost: ${host}\r\nUser-Agent: ${req.headers['user-agent']}\r\n\r\n`,
+            `CONNECT ${host}:${port} HTTP/1.1\r\nHost: ${host}\r\n${headersStringify(req.headers)}\r\n\r\n`,
             'UTF-8',
             () => {
               conn.once('data', () => {
@@ -147,8 +148,11 @@ function createProxy(opts, callbacks) {
         emitEvent(callbacks.onRequestEnd, request)
 
         let headStr = head.toString()
-        if (/^GET/.test(headStr)) {
-          // WS proxy
+        let lwHeadStr = headStr.toLowerCase()
+        // "WSS" will passthrough as https, only proxy "WS"
+        if (/^GET/.test(headStr)
+          && /\bupgrade:\s*websocket\b/.test(lwHeadStr)
+          && /\bconnection:\s*upgrade\b/.test(lwHeadStr)) {
           passThrough.webscoket(head)
         } else if (interHttpsProxy) {
           passThrough.proxy(head, interHttpsProxy)
@@ -168,16 +172,17 @@ function createProxy(opts, callbacks) {
     let port = url.parse(host).port || 80
     let method = req.method
 
-    if (InterHttpProxy) {
-      var proxyObj = url.parse(InterHttpProxy)
-      if (!proxyObj.hostname) return
+    if (interHttpProxy) {
+      var parsedProxy = url.parse(interHttpProxy)
+
+      if (!parsedProxy.hostname) return
       var reqOpts = ctx.proxyToServerRequestOptions
       Object.assign(reqOpts, {
-        host: proxyObj.hostname,
-        port: proxyObj.port || 80,
+        host: parsedProxy.hostname,
+        port: parsedProxy.port || 80,
         path: `http://${host}${port == 80 ? '':':'+port}${urlObj.path || '/'}`
       })
-      debug('HTTP proxy', InterHttpProxy)
+      debug('HTTP proxy', interHttpProxy)
     }
 
     debug('HTTP request', req.url)
@@ -314,7 +319,12 @@ function handleWebsocket(options, proxy) {
   proxy.onWebSocketConnection((ctx, cb) => {
     let id = shortid.generate()
     let debug = bindDebug(`#${id}`)
-    debug('WS connect')
+    let proxies = getProxy()
+
+    debug('WS connect' + (proxies.http ? ' with proxy:'+proxies.http:''))
+    let opts = url.parse(proxies.http)
+    let agent = new HttpsProxyAgent(opts)
+    ctx.proxyToServerWebSocketOptions.agent = agent
 
     // ctx
     //   .onWebSocketSend((ctx, message, flags, cb) => {
@@ -335,6 +345,12 @@ function handleWebsocket(options, proxy) {
   })
   return proxy
 }
+function getProxy() {
+  return {
+    http: process.env['http_proxy'] || process.env['HTTP_PROXY'],
+    https: process.env['https_proxy'] || process.env['HTTPS_PROXY']
+  }
+}
 /*
 * Detect TLS from first bytes of data
 * Inspired from https://gist.github.com/tg-x/835636
@@ -346,6 +362,11 @@ function handleWebsocket(options, proxy) {
 */
 function isTLS(head) {
   return head[0] == 0x16 || head[0] == 0x80 || head[0] == 0x00
+}
+function headersStringify(headers) {
+  return Object.keys(headers).map(function (k) {
+    return k + ': ' + headers[k]
+  }).join('\r\n')
 }
 /**
  * Check callback type and emit safely
