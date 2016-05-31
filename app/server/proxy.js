@@ -172,6 +172,9 @@ function createProxy(opts, callbacks) {
     let port = url.parse(host).port || 80
     let method = req.method
 
+    // ignore HTTPS cert errors
+    ctx.proxyToServerRequest.rejectUnauthorized = false
+
     if (interHttpProxy) {
       var parsedProxy = url.parse(interHttpProxy)
 
