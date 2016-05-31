@@ -58,6 +58,11 @@ function createProxy(opts, callbacks) {
     }
     debug('Tunnel to', req.url)
 
+    function writeTimeout(cb) {
+      socket.write(`HTTP/1.1 504 Gateway Timeout\r\nConnection: close\r\nContent-Type: text/html\r\n\r\n`, () => {
+        cb && cb()
+      })
+    }
     let passThrough = {
       webscoket: function (head) {
         let conn = net.connect(opts.port || 8888, () => {
@@ -97,7 +102,9 @@ function createProxy(opts, callbacks) {
           conn.end()
         })
         conn.on('error', (e) => {
-          conn.destroy()
+          writeTimeout(() => {
+            conn.destroy()
+          })
         })
         conn.on('close', () => {
         })
@@ -133,6 +140,7 @@ function createProxy(opts, callbacks) {
         conn.on('error',function(e){
           debug('Tunnel error', e)
           response.statusMessage = e.message || error
+          writeTimeout()
         })
       }
     }
