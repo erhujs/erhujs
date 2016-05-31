@@ -150,9 +150,7 @@ function createProxy(opts, callbacks) {
         let headStr = head.toString()
         let lwHeadStr = headStr.toLowerCase()
         // "WSS" will passthrough as https, only proxy "WS"
-        if (/^GET/.test(headStr)
-          && /\bupgrade:\s*websocket\b/.test(lwHeadStr)
-          && /\bconnection:\s*upgrade\b/.test(lwHeadStr)) {
+        if (/^GET/.test(headStr) && /\bupgrade:\s*websocket\b/.test(lwHeadStr) && /\bconnection:\s*upgrade\b/.test(lwHeadStr)) {
           passThrough.webscoket(head)
         } else if (interHttpsProxy) {
           passThrough.proxy(head, interHttpsProxy)
@@ -323,12 +321,14 @@ function handleWebsocket(options, proxy) {
     let id = shortid.generate()
     let debug = bindDebug(`#${id}`)
     let proxies = getProxy()
+    let httpProxyServer = proxies.http
 
-    debug('WS connect' + (proxies.http ? ' with proxy:'+proxies.http:''))
-    let opts = url.parse(proxies.http)
-    let agent = new HttpsProxyAgent(opts)
-    ctx.proxyToServerWebSocketOptions.agent = agent
-
+    if (httpProxyServer) {
+      debug('WS connect' + (httpProxyServer ? ' with proxy:'+httpProxyServer:''))
+      let opts = url.parse(httpProxyServer)
+      let agent = new HttpsProxyAgent(opts)
+      ctx.proxyToServerWebSocketOptions.agent = agent
+    }
     // ctx
     //   .onWebSocketSend((ctx, message, flags, cb) => {
     //     debug('WS send')
