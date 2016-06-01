@@ -63,7 +63,19 @@ function createProxy(opts, callbacks) {
         cb && cb()
       })
     }
+    function writeError(err, cb) {
+      socket.write(`HTTP/1.1 500 Internal Server Error\r\nConnection: close\r\nContent-Type: text/html\r\n\r\n${err}`, () => {
+        cb && cb()
+      })
+    }
+
+    /**
+     * Detect which way to proxy tunnel request
+     */
     let passThrough = {
+      /**
+       * Websocket without decryption
+       */
       webscoket: function (head) {
         let conn = net.connect(opts.port || 8888, () => {
           socket.pipe(conn)
@@ -71,7 +83,9 @@ function createProxy(opts, callbacks) {
           socket.emit('data', head)
         })
         conn.on('error', (e) => {
-          conn.destroy()
+          writeError(e, () => {
+            conn.destroy()
+          })
         })
         conn.on('close', () => {
           socket.end()
@@ -80,21 +94,43 @@ function createProxy(opts, callbacks) {
           conn.end()
         })
       },
+      /**
+       * Tunnel behind proxy
+       */
       proxy: function (head, proxyServer) {
         let pObj = url.parse(proxyServer)
         let pPort = pObj.port || 443
         let pHost = pObj.hostname
 
         let conn = net.connect(pPort, pHost, () => {
+          /**
+           * @event connected
+           */
+          emitEvent(callbacks.onConnected, request)
+          /**
+           * @event request-end
+           */
+          emitEvent(callbacks.onRequestEnd, request)
           conn.write(
             `CONNECT ${host}:${port} HTTP/1.1\r\nHost: ${host}\r\n${headersStringify(req.headers)}\r\n\r\n`,
             'UTF-8',
             () => {
+              /**
+               * @event response
+               */
+              emitEvent(callbacks.onResponse, request, response)
+
               conn.once('data', () => {
                 // Connection established response from remote to proxy
                 socket.pipe(conn)
                 conn.pipe(socket)
                 socket.emit('data', head)
+              })
+              conn.on('end', () => {
+                /**
+                 * @event response-end
+                 */
+                emitEvent(callbacks.onResponseEnd, request, response)
               })
             })
         })
@@ -102,13 +138,16 @@ function createProxy(opts, callbacks) {
           conn.end()
         })
         conn.on('error', (e) => {
-          writeTimeout(() => {
+          writeError(e, () => {
             conn.destroy()
           })
         })
         conn.on('close', () => {
         })
       },
+      /**
+       * Tunnel directly
+       */
       tunnel: function (head) {
         let conn = net.connect(port, host, () => {
           /**
@@ -122,6 +161,12 @@ function createProxy(opts, callbacks) {
           socket.pipe(conn)
           conn.pipe(socket)
           socket.emit('data', head)
+          conn.on('end', () => {
+            /**
+             * @event response-end
+             */
+            emitEvent(callbacks.onResponseEnd, request, response)
+          })
         })
         conn.on('data', function (chunk) {
           response.data = Buffer.concat([response.data, chunk], response.data.length + chunk.length)
@@ -151,10 +196,6 @@ function createProxy(opts, callbacks) {
     // need first data to detect WS
     socket.write('HTTP/1.1 200 Connection established\r\n\r\n', 'UTF-8', () => {
       socket.once('data', (head) => {
-        /**
-         * @event request
-         */
-        emitEvent(callbacks.onRequestEnd, request)
 
         let headStr = head.toString()
         let lwHeadStr = headStr.toLowerCase()
@@ -167,6 +208,11 @@ function createProxy(opts, callbacks) {
         if (decrypt) {
           proxy._onHttpServerConnectData(req, socket, head)
         } else {
+          /**
+           * @event request
+           */
+          emitEvent(callbacks.onRequestEnd, request)
+
           if (interHttpsProxy) {
             passThrough.proxy(head, interHttpsProxy)
           } else {
