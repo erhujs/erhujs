@@ -57,9 +57,11 @@ export default {
     // ipcRenderer.on('response-data', (event, request, response) => {
     //   console.log('response-data', response)
     // })
-    
+
     // 感觉一个 response-end 就获取到请求和相应的相关数据了... 不过这样好像不是很好，没了过程？
+    // 过程在捕获修改的交互中需要
     ipcRenderer.on('response-end', (event, request, response) => {
+      console.log('response end', request, response)
       this.addNet(request, response)
     })
   }

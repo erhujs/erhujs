@@ -51,7 +51,7 @@ const mutations = {
 }
 
 /**
- * parser connection 
+ * parser connection
  * TODO 很多字段没有补全
  *
  * @param
@@ -65,15 +65,15 @@ function parser (state, req, res) {
     "method": req.method,
     "status": res.statusCode,
     "statusText": res.statusMessage,
-    "protocol": "Protocol",
+    "protocol": req.protocol,
     "scheme": "Scheme",
     "domain": req.host,
-    "remoteAddress": "Remote Address",
+    "remoteAddress": res.remoteAddress,
     "type": capturedConnection.getResourceType(res.headers['content-type']),
     "initiator": "Initiator",
     "cookies": "Cookies",
     "setCookies": "Set-Cookies",
-    "size": '100kb',
+    "size": res.data.length,
     "sizeContent": '100kb',
     "time": "Time",
     "connectionId": "Connection Id",
@@ -115,12 +115,12 @@ function parser (state, req, res) {
 
 function getColumns(){
   let columns = []
-  
+
   config.defaultColumns.forEach( (item) => {
     if(config.defaultColumnsVisibility[item.id]){
       item.width = 24
       item.left = 0
-      columns.push(item)   
+      columns.push(item)
     }
   })
 
